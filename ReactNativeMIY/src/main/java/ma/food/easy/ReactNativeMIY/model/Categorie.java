@@ -1,6 +1,7 @@
-package com.example.model;
+package ma.food.easy.ReactNativeMIY.model;
 
-import javax.persistence.*;
+
+import jakarta.persistence.*;
 
 @Entity
 public class Categorie {

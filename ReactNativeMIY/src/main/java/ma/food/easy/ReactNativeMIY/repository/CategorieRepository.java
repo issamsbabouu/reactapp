@@ -1,10 +1,10 @@
-package com.example.repository;
+package ma.food.easy.ReactNativeMIY.repository;
 
-import com.example.model.Categorie;
+import ma.food.easy.ReactNativeMIY.model.Categorie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface CategorieRepository extends JpaRepository<Categorie, Long> {
-
+    boolean existsByCatname(String catname);
+    Categorie findCategorieByCatname(String name);
 }

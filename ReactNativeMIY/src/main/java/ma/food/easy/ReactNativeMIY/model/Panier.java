@@ -1,78 +1,53 @@
-package com.example.model;
-
-import javax.persistence.*;
+package ma.food.easy.ReactNativeMIY.model;
+import jakarta.persistence.*;
 import java.util.List;
-
+import java.util.Objects;
 @Entity
+@Table(name ="panier")
 public class Panier {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_panier;
+    private int id;
+    @ManyToOne
+    @JoinColumn(name="customer_id")
+    private User compte;
 
-    @ManyToMany
-    @JoinTable(
-            name = "panier_produit",
-            joinColumns = @JoinColumn(name = "id_panier"),
-            inverseJoinColumns = @JoinColumn(name = "id_produit")
-    )
-    private List<Produit> produits;
+    @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<commande> commandes;
+    public List<commande> getCommandes() {
+        return commandes;
+    }
 
-    @Column(nullable = false)
-    private float prix_total;
 
-    @Column(nullable = false)
-    private boolean etat;
+    public void setCommandes(List<commande> commandes) {
+        this.commandes = commandes;
+    }
 
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public User getCompte() {
+        return compte;
+    }
+    public void setCompte(User compte) {
+        this.compte = compte;
+    }
     public Panier() {
     }
 
-    public Panier(int id_panier, List<Produit> produits, float prix_total, boolean etat) {
-        this.id_panier = id_panier;
-        this.produits = produits;
-        this.prix_total = prix_total;
-        this.etat = etat;
+    public Panier(int id, User compte, List<commande> commandes) {
+        this.id = id;
+        this.commandes=commandes;
+        this.compte = compte;
     }
-
-    public int getId_panier() {
-        return id_panier;
-    }
-
-    public void setId_panier(int id_panier) {
-        this.id_panier = id_panier;
-    }
-
-    public List<Produit> getProduits() {
-        return produits;
-    }
-
-    public void setProduits(List<Produit> produits) {
-        this.produits = produits;
-    }
-
-    public float getPrix_total() {
-        return prix_total;
-    }
-
-    public void setPrix_total(float prix_total) {
-        this.prix_total = prix_total;
-    }
-
-    public boolean isEtat() {
-        return etat;
-    }
-
-    public void setEtat(boolean etat) {
-        this.etat = etat;
-    }
-
     @Override
     public String toString() {
         return "Panier{" +
-                "id_panier=" + id_panier +
-                ", produits=" + produits +
-                ", prix_total=" + prix_total +
-                ", etat=" + etat +
-                '}';
+                "id=" + id +
+                ", compte=" + compte +
+                ", commandes=" + commandes;
     }
 }

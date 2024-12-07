@@ -1,7 +1,8 @@
-package main.java.com.example.service;
+package ma.food.easy.ReactNativeMIY.service;
 
-import com.example.model.Panier;
-import com.example.repository.PanierRepository;
+import ma.food.easy.ReactNativeMIY.model.Panier;
+import ma.food.easy.ReactNativeMIY.repository.PanierRepository;
+import ma.food.easy.ReactNativeMIY.repository.ProduitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,26 +10,43 @@ import java.util.Optional;
 
 @Service
 public class PanierService {
-
     @Autowired
     private PanierRepository panierRepository;
 
-    // Consulter un panier par son ID
-    public Panier consulterPanier(int id) {
-        Optional<Panier> panier = panierRepository.findById(id);
-        return panier.orElse(null); // Si le panier existe, on le retourne, sinon on retourne null
+    @Autowired
+    private ProduitRepository produitRepository;
+    @Autowired
+    private ProduitService produitService;
+
+
+    public Optional<Panier> getPanierById(Long id) {
+        return panierRepository.findById((Long)id);
     }
 
-    // Confirmer un panier (par exemple, marquer comme validé)
-    public boolean confirmerPanier(int id) {
-        Optional<Panier> panier = panierRepository.findById(id);
-        if (panier.isPresent()) {
-            Panier p = panier.get();
-            p.setEtat(true); // Supposons que 'true' signifie que le panier a été validé
-            panierRepository.save(p); // Sauvegarde le panier mis à jour
-            return true;
-        } else {
-            return false; // Le panier n'existe pas
+    public boolean deleteProduitfromPanier(int id) {
+        boolean res;
+        if(panierRepository.existsById((long) id)) {
+            panierRepository.deleteById((long) id);
+            res=true;
         }
+        else{
+
+            res=false;
+        }
+        return res;
+    }
+    public boolean createPanier(Panier panier) {
+        boolean res=false;
+        try{
+            panierRepository.save(panier);
+            res=true;
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return res;
+    }
+    public Optional<Panier> findPanierByCompteId(int id) {
+        return panierRepository.findByCompteId(id);
     }
 }
