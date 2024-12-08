@@ -17,12 +17,13 @@ import java.util.List;
 public class UsersController {
     @Autowired
     private UsersService usersService;
-    @GetMapping("/login")
+    @PostMapping("/login")
     public String authenticateUser(String email, String password, Model model, HttpSession session) {
         comptes compte = usersService.authenticate(email, password);
         if (compte != null) {
             model.addAttribute("this",compte);
             session.setAttribute("authenticatedUsername", compte.getUsername());
+            session.setAttribute("authenticatedPhoto", compte.getPhoto());
             session.setAttribute("authenticatedId", compte.getId());
             System.out.println(session);
             model.addAttribute("authenticatedUser", compte);

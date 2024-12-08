@@ -12,5 +12,5 @@ public interface  CompteRepository extends JpaRepository<comptes, Long> {
     int countByType(String type);
     int countByFiliere(String fill);
     List<comptes> findAllByType(String type);
-
+    comptes findByEmail(String email);
 }

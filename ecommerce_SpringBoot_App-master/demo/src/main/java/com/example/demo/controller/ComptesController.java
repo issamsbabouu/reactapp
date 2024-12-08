@@ -1,9 +1,12 @@
 package com.example.demo.controller;
+import com.example.demo.DTO.LoginRequest;
+import com.example.demo.DTO.LoginResponse;
 import com.example.demo.modele.comptes;
 import com.example.demo.modele.produit;
 import com.example.demo.service.CommandeService;
 import com.example.demo.service.ComptesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,7 @@ public class ComptesController {
     public ComptesController(ComptesService daoComptes) {
         this.daoComptes = daoComptes;
     }
-    @GetMapping
+    @GetMapping("/get")
     public  List<comptes> getAllAccs() {return daoComptes.getAllAccs();
     }
     @GetMapping("/{id}")
@@ -136,6 +139,15 @@ public class ComptesController {
         account.setPhone(phone);
         daoComptes.createCompte(account);
         return "redirect:/comptes/count";
+    }
+    @PostMapping("/loginii")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            LoginResponse response = daoComptes.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     @PostMapping("/delete")
     public String delete(@RequestParam int id,Model model) {

@@ -1,8 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.modele.categorie;
+import com.example.demo.DTO.LoginResponse;
 import com.example.demo.modele.comptes;
-import com.example.demo.modele.produit;
 import com.example.demo.repository.CompteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,6 +83,25 @@ public class ComptesService {
             res=false;
         }
         return res;
+    }
+    public LoginResponse authenticate(String email, String password) {
+        comptes user = compteRepository.findByEmail(email);
+        if (user == null || !user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        // Debugging the role
+        String role = user.getType();
+        System.out.println("User role: " + role); // This will print the role in the server logs
+
+        // Ensure the role is being compared correctly
+        String token = role.equals("client") ? "client-token" : role.equals("admin") ? "admin-token" : null;
+
+        if (token == null) {
+            throw new IllegalArgumentException("Invalid role");
+        }
+
+        return new LoginResponse("Login successful", token);
     }
 
     public int countcompte() {
