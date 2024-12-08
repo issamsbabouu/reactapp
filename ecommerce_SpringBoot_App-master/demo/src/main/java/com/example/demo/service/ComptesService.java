@@ -57,7 +57,6 @@ public class ComptesService {
         existingAccount.setEmail(newaccountData.getEmail());
         existingAccount.setPassword(newaccountData.getPassword());
         existingAccount.setPhone(newaccountData.getPhone());
-        existingAccount.setPhoto(newaccountData.getPhoto());
         return compteRepository.save(existingAccount);
     }
 

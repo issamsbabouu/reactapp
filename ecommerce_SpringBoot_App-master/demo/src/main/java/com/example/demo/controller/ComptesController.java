@@ -117,12 +117,10 @@ public class ComptesController {
                               @RequestParam String photo, @RequestParam String username, @RequestParam String password, @RequestParam String field) {
         comptes account = new comptes();
         account.setType("Student");
-        account.setFiliere(field);
         account.setEmail(emailadress);
         account.setUsername(username);
         account.setNom(fullname);
         account.setPhone(phone);
-        account.setPhoto(photo);
         daoComptes.createCompte(account);
         return "redirect:/comptes/count";
     }
@@ -136,7 +134,6 @@ public class ComptesController {
         account.setUsername(username);
         account.setNom(fullname);
         account.setPhone(phone);
-        account.setPhoto(photo);
         daoComptes.createCompte(account);
         return "redirect:/comptes/count";
     }
