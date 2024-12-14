@@ -26,7 +26,7 @@ public class produit {
     @Column
     private int quantity;
     @ManyToOne
-    @JoinColumn(name="category_id")
+    @JoinColumn(name="category_id")  // La colonne qui fait référence à la catégorie dans la table des produits
     private categorie categorie;
     @OneToMany(mappedBy = "p")
     private List<commande> command;
@@ -48,7 +48,6 @@ public class produit {
         this.categorie = categorie;
         this.ratings=ratings;
         this.quantity=quantity;
-        this.comments = comments;
     }
 
     public produit() {}

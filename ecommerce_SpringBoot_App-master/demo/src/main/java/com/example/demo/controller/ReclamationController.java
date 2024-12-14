@@ -35,14 +35,6 @@ public class ReclamationController {
         return ReclamationSer.getAllReclamations();
     }
 
-    @GetMapping("/myreclamation/{username}")
-    public  String getReclamationsByUsername(@PathVariable String username,Model model) {
-        List<Reclamation> r = ReclamationSer.getReclamationsByUsername(username);
-        List<produit> p = produitService.getAllProducts();
-        model.addAttribute("produits", p);
-        model.addAttribute("reclam",r);
-        return  "reclamation";
-    }
     @GetMapping("/viewdetails")
     public String details(@RequestParam String username) {
 

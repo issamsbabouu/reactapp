@@ -1,62 +1,42 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.CategorieDTO;
 import com.example.demo.modele.categorie;
-import com.example.demo.modele.produit;
+import com.example.demo.repository.CategorieRepository;
 import com.example.demo.service.CategorieService;
-import com.example.demo.service.ProduitService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Controller
-@RequestMapping("/categories")
+@RestController
+@RequestMapping("/api/categories")
 public class CategorieController {
     @Autowired
-    private CategorieService catService;
+    private CategorieService categoryService;
     @Autowired
-    private ProduitService produitService;
+    private CategorieRepository categoryRepository;
 
-    @GetMapping("/{id}")
-    public categorie getCategoryById(@PathVariable int id) {
-        Optional<categorie> c = catService.getCategoryById(id);
-        return c.orElse(null);
+    @GetMapping
+    public List<CategorieDTO> getCategories() {
+        List<categorie> categories = categoryRepository.findAll(); // Récupérer toutes les catégories
+        List<CategorieDTO> categoryDTOs = categories.stream()
+                .map(category -> new CategorieDTO((long) category.getId(), category.getCatname()))
+                .collect(Collectors.toList()); // Mapper vers CategoryDTO
+        return categoryDTOs;
     }
-
-    @GetMapping("/categories")
-            public String getAllCategories(Model model) {
-        List<categorie> c = catService.getAllCategories();
-        model.addAttribute("allc", c);
-        return "dashboard_categories";
+    @PostMapping
+    public ResponseEntity<categorie> addCategory(@RequestBody categorie category) {
+        categorie savedCategory = categoryService.addCategory(category);
+        return new ResponseEntity<>(savedCategory, HttpStatus.CREATED);
     }
-
-    @PostMapping("/addCategory")
-    public String addCategory(@RequestParam String catname, Model model) {
-        categorie categorie = new categorie();
-        categorie.setCatname(catname);
-        boolean isCategoryCreated = catService.createCategorie(categorie);
-
-        if (isCategoryCreated) {
-            return "redirect:/categories/categories";
-        } else {
-            System.out.println("exists already");
-            model.addAttribute("errorMessage", "Category already exists!");
-        }
-        return "redirect:/categories/categories";
-    }
-
-
-    @PostMapping("/delete")
-    public String delete(@RequestParam int idC) {
-        boolean isDeleted = catService.deleteCategorie(idC);
-        if (isDeleted) {
-            System.out.println("categ deleted successfully.");
-        } else {
-            System.out.println("Failed to delete categ.");
-        }
-        return "redirect:/categories/categories";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }
+

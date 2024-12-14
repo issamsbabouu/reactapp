@@ -22,9 +22,6 @@ public class testcontroller {
     @InjectMocks
     private ProduitService produitService;
 
-    @Test
-    public void testGetAllProduits() {
-        List<produit> produits = produitService.getAllProduits();
-        }
+
     // Similarly, you can write tests for other methods like getProduitById, createProduit, updateProduit, deleteProduit
 }

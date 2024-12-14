@@ -36,6 +36,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/easy_food-app/node_modules/@react-native/gradle-plugin" />
+            <option value="$PROJECT_DIR$/easy_food-app/node_modules/@react-native/gradle-plugin/react-native-gradle-plugin" />
+            <option value="$PROJECT_DIR$/easy_food-app/node_modules/@react-native/gradle-plugin/settings-plugin" />
           </set>
         </option>
       </GradleProjectSettings>

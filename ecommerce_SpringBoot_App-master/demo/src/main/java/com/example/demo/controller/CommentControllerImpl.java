@@ -129,26 +129,4 @@ public class CommentControllerImpl {
         model.addAttribute("com",r);
         return  "mycomments";
     }
-    @GetMapping("/viewdetails")
-    public String details(@RequestParam String username) {
-        return "redirect:/comment/mycomment/" + username;
-    }
-    @PostMapping("/addComment")
-    public String addComment(@RequestParam String username,@RequestParam int productId,@RequestParam String content, @RequestParam int idCompte, @RequestParam int rating) {
-        Optional<produit> produitOptional = produitService.getProduitById((long)productId);
-        produit p = produitOptional.get();
-        Comment comment = new Comment();
-        Rating rat = new Rating();
-        comment.setContent(content);
-        rat.setRatingValue(rating);
-        comptes compte = new comptes();
-        compte.setId(idCompte);
-        comment.setProduit(p);
-        rat.setProduit(p);
-        comment.setCompte(compte);
-        rat.setCompte(compte);
-        ratingService.createRating(rat);
-        commentService.createComment(comment);
-        return "redirect:/comment/mycomment/" + username;
-    }
 }

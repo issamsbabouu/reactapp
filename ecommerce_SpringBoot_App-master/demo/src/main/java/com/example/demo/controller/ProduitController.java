@@ -1,56 +1,52 @@
 package com.example.demo.controller;
 
-import com.example.demo.modele.*;
-import com.example.demo.service.*;
+import com.example.demo.DTO.CategorieDTO;
+import com.example.demo.DTO.ProduitDTO;
+import com.example.demo.modele.categorie;
+import com.example.demo.modele.produit;
+import com.example.demo.repository.ProduitRepository;
+import com.example.demo.service.ProduitService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-
-import java.util.*;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/products") // Le préfixe pour toutes les routes dans ce contrôleur
+@RequestMapping("/api/products")
 public class ProduitController {
 
     @Autowired
-    private ProduitService productService;
-
-    @GetMapping("/getall")
-    public String getAllProducts(Model model) {
-        List<produit> products = productService.getAllProducts();
-        model.addAttribute("products", products);  // Ajoute la liste des produits au modèle
-        return "api/products";  // Nom du template Thymeleaf à afficher
+    private ProduitService produitService;  // Service pour gérer la logique métier des produits
+    @Autowired
+    private ProduitRepository produitRepository; // Repository pour interagir avec la base de données
+    @GetMapping
+    public List<ProduitDTO> getProducts() {
+        List<produit> products = produitService.getProducts();
+        return products.stream()
+                .map(product -> new ProduitDTO(product.getId(), product.getLabel(), product.getPrice(), product.getDescription()))
+                .collect(Collectors.toList());
+    }
+    // Ajouter un nouveau produit
+    @PostMapping
+    public ResponseEntity<produit> addProduct(@RequestBody produit product) {
+        produit savedProduct = produitService.addProduct(product);  // Appeler le service pour ajouter un produit
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
-    // Afficher un produit par ID
-    @GetMapping("/{id}")
-    public String getProductById(@PathVariable("id") Long id, Model model) {
-        Optional<produit> product = productService.getProductById(id);
-        model.addAttribute("product", product);  // Ajoute le produit au modèle
-        return "api/product-details";  // Nom du template Thymeleaf pour afficher les détails
+    // Supprimer un produit
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        produitService.deleteProduct(id);  // Appeler le service pour supprimer un produit par ID
+        return ResponseEntity.noContent().build();
     }
 
-    // Afficher le formulaire pour ajouter un produit
-    @GetMapping("/new")
-    public String showProductForm(Model model) {
-        model.addAttribute("product", new produit());  // Ajoute un produit vide pour le formulaire
-        return "api/product-form";  // Nom du template Thymeleaf pour afficher le formulaire
-    }
-
-    @PostMapping("/save")
-    public String saveProduct(produit product) {
-        productService.saveProduct(product);  // Sauvegarde le produit dans la base de données
-        return "redirect:/api/products";  // Redirige vers la liste des produits
-    }
-
-    // Supprimer un produit par ID
-    @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable("id") Long id) {
-        productService.deleteProduct(id);  // Supprime le produit de la base de données
-        return "redirect:/api/products";  // Redirige vers la liste des produits
+    // Modifier un produit (optionnel, si vous avez cette fonctionnalité)
+    @PutMapping("/{id}")
+    public ResponseEntity<produit> updateProduct(@PathVariable Long id, @RequestBody produit updatedProduct) {
+        produit product = produitService.updateProduct(id, updatedProduct);  // Appeler le service pour mettre à jour le produit
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 }
