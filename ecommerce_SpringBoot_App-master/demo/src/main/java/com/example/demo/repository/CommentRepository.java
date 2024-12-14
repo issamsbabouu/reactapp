@@ -12,8 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     int countByCompte_Filiere(String Filiere);
     int countByCompte_Type(String Type);
     List<Comment> findByProduitId(Long produitId);
-
     List<Comment> findAllByCompteUsername(String username);
     List<Comment> findAllByProduitId(int id);
 
+    List<Comment> findByCompteId(Long compteId);
 }

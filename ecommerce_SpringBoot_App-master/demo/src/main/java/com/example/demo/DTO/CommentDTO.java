@@ -15,6 +15,9 @@ public class CommentDTO {
         this.product = product;
     }
 
+    public CommentDTO(Long id, String content, String username, String s) {
+    }
+
     public Long getId() {
         return id;
     }

@@ -31,4 +31,8 @@ public class CommentController {
             return ResponseEntity.notFound().build(); // Return 404 Not Found if the comment is not found
         }
     }
+    @GetMapping("/user/{userId}")
+    public List<CommentDTO> getUserComments(@PathVariable Long userId) {
+        return commentService.getCommentsByUser(userId);
+    }
 }
