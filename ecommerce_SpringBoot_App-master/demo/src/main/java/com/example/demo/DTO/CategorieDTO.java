@@ -4,7 +4,6 @@ public class CategorieDTO {
     private Long id;
     private String catname;
 
-    // Constructeur, Getters et Setters
     public CategorieDTO(Long id, String catname) {
         this.id = id;
         this.catname = catname;

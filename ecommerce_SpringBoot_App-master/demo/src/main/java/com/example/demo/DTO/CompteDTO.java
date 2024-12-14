@@ -6,13 +6,17 @@ public class CompteDTO {
     private String email;
     private String nom;
     private String type;
+    private int phone;
 
-    public CompteDTO(int id, String username, String email, String nom, String type) {
+
+
+    public CompteDTO(int id, String username, String email, String nom, String type, int phone) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.nom = nom;
         this.type = type;
+        this.phone = phone;
     }
 
     public String getType() {
@@ -55,4 +59,8 @@ public class CompteDTO {
     public void setNom(String nom) {
         this.nom = nom;
     }
+    public int getPhone() {
+        return phone;
+    }
+
 }

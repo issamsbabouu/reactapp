@@ -22,6 +22,7 @@ public class comptes {
     private String photo;
     private String nom;
     private String filiere;
+    private String status;
     @OneToMany(mappedBy = "compte", cascade = CascadeType.ALL)
     private List<Panier> paniers;
     @OneToMany(mappedBy = "compte", cascade = CascadeType.ALL)
@@ -31,7 +32,13 @@ public class comptes {
     @OneToMany(mappedBy = "compte")
     private List<Rating> ratings;
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public int getId() {
         return id;
