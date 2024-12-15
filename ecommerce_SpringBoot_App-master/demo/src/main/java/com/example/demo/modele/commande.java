@@ -1,103 +1,59 @@
 package com.example.demo.modele;
-import jakarta.persistence.*;
 
 import java.util.List;
-import java.util.Objects;
 
-@Entity
-@Table(name ="commands")
 public class commande {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column
-    private String dateLivraison;
-    @Column
-    private String lieuLivraison;
-    @Column
-    private Boolean delivered;
-    @Column
+    private Long id;
+    private String clientName;
+    private String deliveryAddress;
+    private List<Long> productIds;  // Assuming product IDs are a list of Longs
     private int quantity;
-    @Column
-    private Boolean confirmed;
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private produit p;
-    @ManyToOne
-    @JoinColumn(name="customer_id")
-    private comptes compte;
-    @ManyToOne
-    @JoinColumn(name="deliveryman_id")
-    private comptes deliveryman;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "panier_id")
-    private Panier panier;
+    private String livreurName;
 
-    public Boolean getConfirmed() {
-        return confirmed;
-    }
+    // No-argument constructor for Jackson
+    public commande() {}
 
-    public void setConfirmed(Boolean confirmed) {
-        this.confirmed = confirmed;
-    }
-    public Panier getPanier() {
-        return panier;
-    }
-    public void setPanier(Panier panier) {
-        this.panier = panier;
-    }
-
-    public commande() {
-    }
-    public commande(int id,comptes deliveryman, int quantity, produit p, comptes compte, String dateLivraison, String lieuLivraison,  Boolean delivered, Boolean confirmed) {
+    // Constructor to easily create a DTO from the entity
+    public commande(Long id, String clientName, String deliveryAddress, List<Long> productIds, int quantity, String livreurName) {
         this.id = id;
-        this.compte = compte;
-        this.dateLivraison = dateLivraison;
-        this.lieuLivraison = lieuLivraison;
-        this.delivered = delivered;
-        this.p=p;
-        this.quantity= quantity;
-        this.deliveryman=deliveryman;
-        this.confirmed=confirmed;
+        this.clientName = clientName;
+        this.deliveryAddress = deliveryAddress;
+        this.productIds = productIds;
+        this.quantity = quantity;
+        this.livreurName = livreurName;
     }
-    public int getId() {
+
+    // Getters and setters for all fields
+    public Long getId() {
         return id;
     }
 
-    public comptes getDeliveryman() {
-        return deliveryman;
-    }
-
-    public void setDeliveryman(comptes deliveryman) {
-        this.deliveryman = deliveryman;
-    }
-
-    public comptes getCompte() {
-        return compte;
-    }
-    public String getDateLivraison() {
-        return dateLivraison;
-    }
-    public String getLieuLivraison() {
-        return lieuLivraison;
-    }
-    public Boolean isDelivered() {
-        return delivered;
-    }
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
-    public void setCompte(comptes compte) {
-        this.compte = compte;
+
+    public String getClientName() {
+        return clientName;
     }
-    public void setDateLivraison(String dateLivraison) {
-        this.dateLivraison = dateLivraison;
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
-    public void setLieuLivraison(String lieuLivraison) {
-        this.lieuLivraison = lieuLivraison;
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
     }
-    public void setDelivered(Boolean delivered) {
-        this.delivered = delivered;
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+
+    public List<Long> getProductIds() {
+        return productIds;
+    }
+
+    public void setProductIds(List<Long> productIds) {
+        this.productIds = productIds;
     }
 
     public int getQuantity() {
@@ -108,36 +64,11 @@ public class commande {
         this.quantity = quantity;
     }
 
-    public produit getP() {
-        return p;
+    public String getLivreurName() {
+        return livreurName;
     }
 
-    public void setP(produit p) {
-        this.p = p;
-    }
-
-    public Boolean getDelivered() {
-        return delivered;
-    }
-
-    @Override
-    public String toString() {
-        return "commande{" +
-                "id=" + id +
-                ", compte=" + compte +
-                ", dateLivraison='" + dateLivraison + '\'' +
-                ", lieuLivraison='" + lieuLivraison + '\'' +
-                '}';
-    }
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        commande commande = (commande) o;
-        return id == commande.id && Objects.equals(compte, commande.compte) && Objects.equals(dateLivraison, commande.dateLivraison) && Objects.equals(lieuLivraison, commande.lieuLivraison );
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, compte, dateLivraison, lieuLivraison);
+    public void setLivreurName(String livreurName) {
+        this.livreurName = livreurName;
     }
 }

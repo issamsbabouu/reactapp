@@ -14,17 +14,19 @@ const LoginScreen = ({ navigation }) => {
     try {
       console.log(values);  // Debugging line to inspect the values object
       const response = await axios.post("http://127.0.0.1:8080/comptes/loginii", values);
+      console.log("Backend response:", response.data); // Debugging line
+
       const { message, token, type } = response.data;
 
       if (type === "client") {
         navigation.navigate("Home");
       } else if (type === "admin") {
         navigation.navigate("gusers");
-      }
-      else if (type === "livreur") {
+      } else if (type === "livreur") {
         navigation.navigate("commandes");
       } else {
-        alert('Invalid role');
+        console.error("Unexpected role type:", type);
+        alert('Invalid role: ' + type);
       }
     } catch (error) {
       alert('Login failed: ' + (error.response?.data || error.message));

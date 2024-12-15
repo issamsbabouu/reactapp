@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface ProduitRepository extends JpaRepository<produit, Long> {
     @Query("SELECT p FROM produit p JOIN FETCH p.categorie")
-    List<produit> findAllWithCategories();
+    List<produit> findAllByIdIn(List<Integer> ids);
+
 }

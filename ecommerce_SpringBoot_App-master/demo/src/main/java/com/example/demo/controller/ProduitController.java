@@ -23,11 +23,8 @@ public class ProduitController {
     @Autowired
     private ProduitRepository produitRepository; // Repository pour interagir avec la base de données
     @GetMapping
-    public List<ProduitDTO> getProducts() {
-        List<produit> products = produitService.getProducts();
-        return products.stream()
-                .map(product -> new ProduitDTO(product.getId(), product.getLabel(), product.getPrice(), product.getDescription()))
-                .collect(Collectors.toList());
+    public List<ProduitDTO> getAllProducts() {
+        return produitService.getAllProducts();
     }
     // Ajouter un nouveau produit
     @PostMapping

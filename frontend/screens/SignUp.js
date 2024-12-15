@@ -41,7 +41,7 @@ const SignUp = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Sign Up</Text>
+            <Text style={styles.header}>Sign Up as a customer</Text>
 
             <TextInput
                 style={styles.input}

@@ -1,31 +1,32 @@
 package com.example.demo.controller;
 
-import com.example.demo.modele.categorie;
-import com.example.demo.modele.commande;
-import com.example.demo.modele.comptes;
-import com.example.demo.modele.produit;
-import com.example.demo.service.CategorieService;
+import com.example.demo.DTO.CommandeDTO;
 import com.example.demo.service.CommandeService;
-import com.example.demo.service.ComptesService;
-import com.example.demo.service.ProduitService;
-import org.aspectj.bridge.ICommand;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
-@Controller
-@RequestMapping("/commande")
+@RestController
+@RequestMapping("/api/orders")
 public class CommandeController {
-    @Autowired
-    private ComptesService compteser;
+
     @Autowired
     private CommandeService commandeService;
 
+    // Endpoint to create an order
+    @PostMapping
+    public ResponseEntity<CommandeDTO> createOrder(@RequestBody CommandeDTO commandeDTO) {
+        try {
+            // Call service to create the order
+            CommandeDTO createdOrder = commandeService.createOrder(commandeDTO);
 
+            // Return success response with the created order details
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+        } catch (Exception e) {
+            // Handle any exceptions and return an error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
 }
-
-

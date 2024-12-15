@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import SettingsScreen from './screens/SettingsScreen';
 import ProductListScreen from './screens/ProductListScreen';
 import LoginScreen from './screens/LoginScreen';
 import GestionUsersadmn from './screens/GestionUsersadmn';
@@ -13,11 +12,17 @@ import { StyleSheet } from 'react-native';
 import Dashboard from './screens/Dashboard';
 import GestionCommentaires from './screens/GestionCommentaire';
 import SignUp from "./screens/SignUp";
-import SignUpp from "./screens/SignUpDeliveryman"; // Ensure this is the correct import
+import SignUpp from "./screens/SignUpDeliveryman";
+import UserComments from "./screens/MesComments"; // Ensure this is the correct import
+import MyOrders from "./screens/MyOrders";
+import SettingsScreen from "./screens/SettingsScreen";
+import SplashScreen from "./screens/SplashScreen";
+import OrderFormScreen from "./screens/OrderFormScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Tab Navigator for clients
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
@@ -27,37 +32,42 @@ const TabNavigator = () => (
         }}
     >
         <Tab.Screen
-            name="Accueil"
-            component={ProductListScreen}
-            options={{ headerShown: false }}
-        />
-        <Tab.Screen
-            name="Produits"
+            name="Products"
             component={ProductListScreen}
             options={{
-                tabBarIcon: ({ color, size }) => <Ionicons name="list-outline" size={size} color={color} />,
+                tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
                 headerShown: false,
             }}
         />
         <Tab.Screen
-            name="Mon compte"
+            name="My Orders"
+            component={MyOrders}
             options={{
-                tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+                tabBarIcon: ({ color, size }) => <Ionicons name="cart-outline" size={size} color={color} />,
                 headerShown: false,
             }}
         />
         <Tab.Screen
-            name="Mes commandes"
+            name="Mes Commentaires"
+            component={UserComments}
             options={{
-                tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color} />,
+                tabBarIcon: ({ color, size }) => <Ionicons name="chatbubble-outline" size={size} color={color} />,
                 headerShown: false,
             }}
         />
         <Tab.Screen
-            name="Paramètres"
+            name="Settings"
             component={SettingsScreen}
             options={{
                 tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
+                headerShown: false,
+            }}
+        />
+        <Tab.Screen
+            name="Logout"
+            component={LoginScreen}
+            options={{
+                tabBarIcon: ({ color, size }) => <Ionicons name="log-out-outline" size={size} color={color} />,
                 headerShown: false,
             }}
         />
@@ -65,24 +75,49 @@ const TabNavigator = () => (
 );
 
 const App = () => {
+    const [userType, setUserType] = useState(null); // State to store user type
+
+    useEffect(() => {
+        // Fetch user data (you could get this from a login or authentication API)
+        const user = { type: 'client' }; // This is just an example. Replace with actual logic
+        setUserType(user.type); // Set user type when fetched
+    }, []);
+
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
+            <Stack.Navigator initialRouteName="SplashScreen">
+                <Stack.Screen name="SplashScreen" component={SplashScreen}
+                              options={{ headerShown: false }}/>
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
                     options={{ headerShown: false }}
                 />
-                <Stack.Screen
-                    name="Home"
-                    component={ProductListScreen}
-                    options={{ headerShown: false }}
-                />
+                {/* Only show TabNavigator if user is a client */}
+                {userType === 'client' && (
+                    <Stack.Screen
+                        name="Home"
+                        component={ProductListScreen}
+                        options={{ headerShown: false }}
+                    />
+
+                )}
                 <Stack.Screen
                     name="gusers"
                     component={GestionUsersadmn}
                     options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                    name="mescommentaires"
+                    component={UserComments}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="parametres"
+                    component={SettingsScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen name="OrderForm" component={OrderFormScreen} options={{ headerShown: false }} />
                 <Stack.Screen
                     name="Gestionprods"
                     component={Gestionprods}
@@ -106,12 +141,12 @@ const App = () => {
                 <Stack.Screen
                     name="SignUp"
                     component={SignUp}
-                    options={{ headerShown: false }}  // Customize header if needed
+                    options={{ headerShown: false }}
                 />
                 <Stack.Screen
                     name="SignUpp"
                     component={SignUpp}
-                    options={{ headerShown: false }}  // Customize header if needed
+                    options={{ headerShown: false }}
                 />
             </Stack.Navigator>
         </NavigationContainer>

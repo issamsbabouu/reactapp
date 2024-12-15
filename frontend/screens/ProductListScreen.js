@@ -1,201 +1,182 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, FlatList, TouchableOpacity, Image } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, StyleSheet, TextInput, ActivityIndicator, FlatList, TouchableOpacity, Image, Modal, Button } from 'react-native';
 import axios from 'axios';
 
-const ProductListScreen = () => {
-    const [categories, setCategories] = useState([]); // Liste des catégories
-    const [products, setProducts] = useState([]); // Liste des produits
-    const [filteredProducts, setFilteredProducts] = useState([]); // Produits filtrés
-    const [selectedCategory, setSelectedCategory] = useState('all'); // Catégorie sélectionnée
-    const [searchQuery, setSearchQuery] = useState(''); // Query pour la recherche
-    const [loading, setLoading] = useState(true); // Indicateur de chargement
+const ProductListScreen = ({ navigation }) => {
+    const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [basket, setBasket] = useState([]);
+    const [deliveryAddress, setDeliveryAddress] = useState('');
+    const [quantity, setQuantity] = useState(1);
+    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isBasketVisible, setIsBasketVisible] = useState(false);
 
-    // Récupération des catégories et produits depuis l'API
+    const handleAddToBasket = (product) => {
+        const existingProductIndex = basket.findIndex(item => item.id === product.id);
+        if (existingProductIndex >= 0) {
+            const updatedBasket = [...basket];
+            updatedBasket[existingProductIndex].quantity += quantity;
+            setBasket(updatedBasket);
+        } else {
+            setBasket([...basket, { ...product, quantity }]);
+        }
+    };
+
     useEffect(() => {
-        // Fetch des catégories
-        axios.get('http://localhost:8080/api/categories')
-            .then(response => {
-                setCategories(response.data);
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des catégories', error);
-            });
-
-        // Fetch des produits
         axios.get('http://localhost:8080/api/products')
             .then(response => {
                 setProducts(response.data);
-                setFilteredProducts(response.data); // Affiche tous les produits initialement
+                setFilteredProducts(response.data);
                 setLoading(false);
             })
             .catch(error => {
-                console.error('Erreur lors de la récupération des produits', error);
+                console.error('Error fetching products', error);
                 setLoading(false);
             });
     }, []);
 
-    // Fonction de recherche des produits
     const handleSearchChange = (query) => {
         setSearchQuery(query);
-        filterProducts(query, selectedCategory);
+        filterProducts(query);
     };
 
-    // Filtrer les produits selon la catégorie sélectionnée et la recherche
-    const filterProducts = (query, category) => {
+    const filterProducts = (query) => {
         let filtered = products;
-
-        // Filtrer par catégorie
-        if (category !== 'all') {
-            filtered = filtered.filter(product => product.categorieId === category);
-        }
-
-        // Filtrer par recherche
-        if (query) {
-            filtered = filtered.filter(product =>
-                product.label.toLowerCase().includes(query.toLowerCase())
-            );
-        }
-
+        if (query) filtered = filtered.filter(product => product.label.toLowerCase().includes(query.toLowerCase()));
         setFilteredProducts(filtered);
     };
 
-    // Changer la catégorie sélectionnée
-    const handleCategoryChange = (categoryId) => {
-        setSelectedCategory(categoryId);
-        filterProducts(searchQuery, categoryId); // Applique le filtrage en fonction de la catégorie et de la recherche
+    const handleToggleBasket = () => {
+        setIsBasketVisible(!isBasketVisible);
+    };
+
+    const handleRemoveFromBasket = (productId) => {
+        setBasket(basket.filter(item => item.id !== productId));
+    };
+
+    const handleSubmitOrder = () => {
+        const orderData = {
+            productIds: basket.map(item => item.id),
+            deliveryAddress,
+            quantity,
+            totalAmount: basket.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        };
+
+        axios.post('http://localhost:8080/api/commands', orderData)
+            .then(response => {
+                console.log('Order placed:', response.data);
+                setBasket([]);
+                setIsFormVisible(false);
+            })
+            .catch(error => {
+                console.error('Error placing order:', error);
+            });
     };
 
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#3498db" />
-                <Text style={styles.loadingText}>Chargement des produits...</Text>
+                <Text style={styles.loadingText}>Loading products...</Text>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            {/* Search bar */}
             <TextInput
                 style={styles.searchBar}
-                placeholder="Rechercher un produit"
+                placeholder="Search for products"
                 value={searchQuery}
                 onChangeText={handleSearchChange}
             />
 
-            {/* Category picker */}
-            <Picker
-                selectedValue={selectedCategory}
-                onValueChange={handleCategoryChange}
-                style={styles.categoryPicker}
-            >
-                <Picker.Item label="Toutes les catégories" value="all" />
-                {categories.map(category => (
-                    <Picker.Item key={category.id} label={category.catname} value={category.id} />
-                ))}
-            </Picker>
+            {/* Basket Button */}
+            <TouchableOpacity style={styles.basketButton} onPress={handleToggleBasket}>
+                <Text style={styles.basketText}>Basket ({basket.length} items)</Text>
+            </TouchableOpacity>
 
-            {/* Product list */}
             <FlatList
                 data={filteredProducts}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 renderItem={({ item }) => (
                     <View style={styles.productCard}>
-                        <Image
-                            source={{ uri: item.photo }}
-                            style={styles.productImage}
-                            accessibilityLabel={`Image de ${item.label}`}
-                        />
+                        <Image source={{ uri: item.photo }} style={styles.productImage} />
                         <Text style={styles.productName}>{item.label}</Text>
-                        {/* Affichage de la catégorie du produit */}
-                        <Text style={styles.productCategory}>
-                            {categories.find(cat => cat.id === item.categorieId)?.catname || 'Aucune catégorie'}
-                        </Text>
-                        <Text style={styles.productPrice}>{item.price} MAD</Text>
+                        <Text style={styles.productPrice}>Price: {item.price} MAD</Text>
+                        <TouchableOpacity
+                            style={styles.addToBasketButton}
+                            onPress={() => handleAddToBasket(item)}
+                        >
+                            <Text style={styles.addToBasketText}>Add to basket</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
             />
+
+            {/* Basket Modal */}
+            {isBasketVisible && (
+                <Modal visible={isBasketVisible} animationType="slide" transparent={true} onRequestClose={handleToggleBasket}>
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.basketModalContainer}>
+                            <Text style={styles.modalTitle}>Your Basket</Text>
+                            <FlatList
+                                data={basket}
+                                keyExtractor={(item) => item.id.toString()}
+                                renderItem={({ item }) => (
+                                    <View style={styles.basketItem}>
+                                        <Text>{item.label} - {item.quantity} x {item.price} MAD</Text>
+                                        <TouchableOpacity onPress={() => handleRemoveFromBasket(item.id)}>
+                                            <Text style={styles.removeText}>Remove</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                            <Button
+                                title="Proceed to Order"
+                                onPress={() => {
+                                    handleToggleBasket();
+                                    navigation.navigate('OrderForm', { basket }); // Pass basket data to the OrderForm screen
+                                }}
+                            />
+                            <Button title="Close" onPress={handleToggleBasket} />
+                        </View>
+                    </View>
+                </Modal>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        paddingHorizontal: 16,
-        paddingTop: 40, // Augmenter la marge supérieure pour décaler le contenu vers le bas
-        backgroundColor: '#ecf0f1',
+        marginTop: 80, flex: 1, padding: 10
     },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loadingText: {
-        fontSize: 18,
-        color: '#3498db',
-        marginTop: 10,
-    },
-    searchBar: {
-        marginTop: 20,
-        width: '100%',
-        padding: 12,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 25,
-        marginBottom: 15,
+    searchBar: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, paddingLeft: 8 },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    loadingText: { marginTop: 10 },
+    productCard: { width: '48%', marginBottom: 20, padding: 10, backgroundColor: '#f9f9f9', borderRadius: 10 },
+    productImage: { width: '100%', height: 150, borderRadius: 10 },
+    productName: { fontSize: 16, fontWeight: 'bold', marginVertical: 5 },
+    productPrice: { fontSize: 14, marginBottom: 10 },
+    addToBasketButton: { backgroundColor: '#3498db', padding: 10, borderRadius: 5 },
+    addToBasketText: { color: '#fff', textAlign: 'center' },
+    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+    basketModalContainer: {
         backgroundColor: '#fff',
-        fontSize: 16,
-        color: '#2c3e50',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        maxHeight: '70%'
     },
-    categoryPicker: {
-        width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 25,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    productCard: {
-        width: '48%',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        margin: '1%',
-        padding: 12,
-        alignItems: 'center',
-    },
-    productImage: {
-        width: '100%',
-        height: 140,
-        borderRadius: 12,
-        marginBottom: 10,
-    },
-    productName: {
-        fontSize: 18,
-        fontWeight: '600',
-        textAlign: 'center',
-        marginBottom: 5,
-        color: '#34495e',
-    },
-    productCategory: {
-        fontSize: 14,
-        color: '#7f8c8d',
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    productPrice: {
-        fontSize: 16,
-        color: '#3498db',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
+    modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+    basketItem: { marginBottom: 10 },
+    removeText: { color: 'red', textDecorationLine: 'underline' },
+    basketButton: { backgroundColor: '#3498db', padding: 10, marginBottom: 20, borderRadius: 5 },
+    basketText: { color: '#fff', textAlign: 'center' }
 });
 
 export default ProductListScreen;

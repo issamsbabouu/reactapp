@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.DTO.CategorieDTO;
+import com.example.demo.DTO.ProduitDTO;
 import com.example.demo.modele.categorie;
 import com.example.demo.modele.produit;
 import com.example.demo.repository.ProduitRepository;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProduitService {
@@ -15,10 +18,21 @@ public class ProduitService {
     @Autowired
     private ProduitRepository produitRepository;  // Utiliser le repository des produits
 
-    public List<produit> getProducts() {
-        return produitRepository.findAll();  // Renvoie tous les produits
+    public List<ProduitDTO> getAllProducts() {
+        return produitRepository.findAll().stream()
+                .map(produit -> new ProduitDTO(
+                        produit.getId(),
+                        produit.getLabel(),
+                        produit.getDescription(),
+                        produit.getPrice(),
+                        produit.getColor(),
+                        produit.getPhoto(),
+                        produit.getSize(),
+                        produit.getQuantity(),
+                        new CategorieDTO((long) produit.getCategorie().getId(), produit.getCategorie().getCatname())  // Mapping the category to DTO
+                ))
+                .collect(Collectors.toList());
     }
-
     // Ajouter un nouveau produit
     public produit addProduct(produit product) {
         return produitRepository.save(product);

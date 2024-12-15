@@ -36,13 +36,13 @@ public class CommentService {
             throw new RuntimeException("Comment not found with id: " + commentId);
         }
     }
-    public List<CommentDTO> getCommentsByUser(Long userId) {
-        List<Comment> comments = commentRepository.findByCompteId(userId);
-        return comments.stream().map(comment -> new CommentDTO(
-                comment.getId(),
-                comment.getContent(),
-                comment.getCompte().getUsername(),
-                comment.getProduit() != null ? comment.getProduit().getLabel() : "N/A"
-        )).collect(Collectors.toList());
+    public List<Comment> getCommentsByUser(Long compteId) {
+        // Fetch comments from the repository
+        List<Comment> comments = commentRepository.findByCompteId(compteId);
+
+        // Log the result
+        System.out.println("Comments fetched from DB: " + comments);
+
+        return comments;
     }
 }

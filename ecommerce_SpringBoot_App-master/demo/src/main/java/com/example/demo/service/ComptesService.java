@@ -26,14 +26,23 @@ public class ComptesService {
         if (user == null || !user.getPassword().equals(password)) {
             throw new IllegalArgumentException("Invalid credentials");
         }
+
         String role = user.getType();
-        System.out.println("User role: " + role);
-        String token = role.equals("client") ? "client-token" : role.equals("admin") ? "admin-token" : role.equals("livreur") ? "livreur-token": null;
+        System.out.println("User role: " + role); // Debugging line
+
+        String token = role.equals("client") ? "client-token" :
+                role.equals("admin") ? "admin-token" :
+                        role.equals("livreur") ? "livreur-token" : null;
+
         if (token == null) {
             throw new IllegalArgumentException("Invalid role");
         }
-        return new LoginResponse("Login successful", token);
+
+        // Retourne également l'ID de l'utilisateur pour le stockage en session
+        return new LoginResponse(user.getId(), "Login successful", token, role);
     }
+
+
     public List<comptes> findByType(String type){
         return compteRepository.findAllByType(type);
     }

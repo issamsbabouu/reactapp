@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from 'react-native';
+
 
 const settingsOptions = [
   { id: '1', title: 'Thème' },
   { id: '3', title: 'Confidentialité' },
   { id: '4', title: 'Langue' },
   { id: '5', title: 'À propos de l\'application' },
-  { id: '6', title: 'Supprimer mon compte' }, // Add the delete account option here
+  { id: '6', title: 'Supprimer mon compte' },
 ];
 
 const languageOptions = [
@@ -14,13 +15,13 @@ const languageOptions = [
   { id: '2', title: 'Anglais' },
 ];
 
-const aboutText = "";
+const aboutText = "Ceci est une application de démonstration. Elle vous permet de gérer vos paramètres, y compris la langue et le thème.";
 
 const SettingsScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false); // State for the delete confirmation modal
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const handleThemePress = () => {
     setModalVisible(true);
@@ -35,130 +36,115 @@ const SettingsScreen = () => {
   };
 
   const handleDeleteAccountPress = () => {
-    setDeleteModalVisible(true); // Show the confirmation modal when delete account is pressed
+    setDeleteModalVisible(true);
   };
 
   const handleDeleteConfirm = () => {
-    // Add your logic to delete the account here
     console.log("Account deleted");
-    setDeleteModalVisible(false); // Close the modal after confirmation
+    setDeleteModalVisible(false);
   };
 
   const handleDeleteCancel = () => {
-    setDeleteModalVisible(false); // Close the modal without deleting
+    setDeleteModalVisible(false);
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.option, item.title === 'Supprimer mon compte' && styles.deleteButton]} // Apply deleteButton style for the 'Delete Account' option
-      onPress={
-        item.title === 'Thème'
-          ? handleThemePress
-          : item.title === 'Langue'
-          ? handleLanguagePress
-          : item.title === 'À propos de l\'application'
-          ? handleAboutPress
-          : item.title === 'Supprimer mon compte'
-          ? handleDeleteAccountPress
-          : null
-      }
-    >
-      <Text style={[styles.optionText, item.title === 'Supprimer mon compte' && styles.deleteButtonText]}>
-        {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
   const renderLanguageItem = ({ item }) => (
-    <TouchableOpacity style={styles.languageOption}>
-      <Text style={styles.languageText}>{item.title}</Text>
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.languageOption}>
+        <Text style={[styles.languageText, isDarkMode && styles.darkText]}>{item.title}</Text>
+      </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Paramètres</Text>
-      <FlatList
-        data={settingsOptions}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-      
-      {/* Theme Modal */}
-      <Modal transparent={true} visible={modalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalHeader}>Choisir un thème</Text>
-          <TouchableOpacity
-            style={[styles.button, styles.lightButton]}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.buttonText}>Clair</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.darkButton]}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.buttonText}>Sombre</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.closeButtonText}>Fermer</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <View style={[styles.container, isDarkMode && styles.darkContainer]}>
+        <Text style={[styles.header, isDarkMode && styles.darkHeader]}>Paramètres</Text>
+        {settingsOptions.map(option => (
+            <TouchableOpacity key={option.id} style={styles.option} onPress={() => {
+              if (option.id === '1') handleThemePress();
+              if (option.id === '4') handleLanguagePress();
+              if (option.id === '5') handleAboutPress();
+              if (option.id === '6') handleDeleteAccountPress();
+            }}>
+              <Text style={[styles.optionText, isDarkMode && styles.darkText]}>{option.title}</Text>
+            </TouchableOpacity>
+        ))}
 
-      {/* Language Modal */}
-      <Modal transparent={true} visible={languageModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalHeader}>Choisir une langue</Text>
-          <ScrollView style={styles.languageList}>
+        {/* Theme Modal */}
+        <Modal transparent={true} visible={modalVisible} animationType="slide">
+          <View style={styles.modalContainer}>
+            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>Choisir un thème</Text>
+            <TouchableOpacity
+                style={[styles.button, styles.lightButton]}
+                onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>Clair</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.button, styles.darkButton]}
+                onPress={toggleTheme} // Activate dark mode
+            >
+              <Text style={styles.buttonText}>Sombre</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        {/* Language Modal */}
+        <Modal transparent={true} visible={languageModalVisible} animationType="slide">
+          <View style={styles.modalContainer}>
+            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>Choisir une langue</Text>
             <FlatList
-              data={languageOptions}
-              renderItem={renderLanguageItem}
-              keyExtractor={item => item.id}
+                data={languageOptions}
+                renderItem={renderLanguageItem}
+                keyExtractor={item => item.id}
+                contentContainerStyle={styles.languageList}
             />
-          </ScrollView>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setLanguageModalVisible(false)}
-          >
-            <Text style={styles.closeButtonText}>Fermer</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-      {}
-      <Modal transparent={true} visible={aboutModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalHeader}>À propos de l'application</Text>
-          <Text style={styles.aboutText}>{aboutText}</Text>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setAboutModalVisible(false)}
-          >
-            <Text style={styles.closeButtonText}>Fermer</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-      {}
-      <Modal transparent={true} visible={deleteModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalHeader}>Êtes-vous sûr de vouloir supprimer votre compte ?</Text>
-          <TouchableOpacity
-            style={[styles.button, styles.lightButton]}
-            onPress={handleDeleteConfirm}
-          >
-            <Text style={styles.buttonText}>Oui</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.darkButton]}
-            onPress={handleDeleteCancel}
-          >
-            <Text style={styles.buttonText}>Non</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
+            <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setLanguageModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        {/* About Modal */}
+        <Modal transparent={true} visible={aboutModalVisible} animationType="slide">
+          <View style={styles.modalContainer}>
+            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>À propos de l'application</Text>
+            <Text style={[styles.aboutText, isDarkMode && styles.darkAboutText]}>{aboutText}</Text>
+            <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setAboutModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        {/* Delete Account Modal */}
+        <Modal transparent={true} visible={deleteModalVisible} animationType="slide">
+          <View style={styles.modalContainer}>
+            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>Êtes-vous sûr de vouloir supprimer votre compte ?</Text>
+            <TouchableOpacity
+                style={[styles.button, styles.lightButton]}
+                onPress={handleDeleteConfirm}
+            >
+              <Text style={styles.buttonText}>Oui</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.button, styles.darkButton]}
+                onPress={handleDeleteCancel}
+            >
+              <Text style={styles.buttonText}>Non</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
   );
 };
 
@@ -169,10 +155,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     marginTop: 50,
   },
+  darkContainer: {
+    backgroundColor: '#333',
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  darkHeader: {
+    color: 'white',
   },
   option: {
     padding: 15,
@@ -182,20 +174,20 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 18,
   },
+  darkText: {
+    color: 'white',
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     padding: 20,
-    marginTop: 300,
-    marginBottom: 300,
-    marginLeft: 50,
-    marginRight: 50,
-    borderRadius: 60,
+    borderRadius: 10,
+    marginHorizontal: 40,
   },
-  deleteButtonText: {
-    color: 'red', 
+  darkModalHeader: {
+    color: 'white',
   },
   modalHeader: {
     fontSize: 24,
@@ -249,6 +241,9 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
     marginVertical: 20,
     paddingHorizontal: 10,
+  },
+  darkAboutText: {
+    color: 'white',
   },
 });
 

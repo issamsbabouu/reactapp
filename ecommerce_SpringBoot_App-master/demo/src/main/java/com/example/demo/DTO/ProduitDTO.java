@@ -1,7 +1,5 @@
 package com.example.demo.DTO;
 
-import com.example.demo.modele.categorie;
-
 public class ProduitDTO {
 
     private int id;
@@ -14,16 +12,28 @@ public class ProduitDTO {
     private int quantity;
     private CategorieDTO categorie;
 
-    public ProduitDTO() {
+    // Constructor with all fields (ensure it's used to initialize product correctly)
+    public ProduitDTO(int id, String label, String description, double price, String color, String photo, String size, int quantity, CategorieDTO categorie) {
+        this.id = id;
+        this.label = label;
+        this.description = description;
+        this.price = price;
+        this.color = color;
+        this.photo = photo;
+        this.size = size;
+        this.quantity = quantity;
+        this.categorie = categorie;
     }
 
-    public ProduitDTO(int id, String label, double price, String color) {
+    // Constructor with partial fields for product information
+    public ProduitDTO(int id, String label, double price, String photo) {
         this.id = id;
         this.label = label;
         this.price = price;
-        this.color = color;
+        this.photo = photo;
     }
 
+    // Getter and Setter methods
     public int getId() {
         return id;
     }
@@ -86,18 +96,6 @@ public class ProduitDTO {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public ProduitDTO(int id, String label, String description, double price, String color, String photo, String size, int quantity, CategorieDTO categorie) {
-        this.id = id;
-        this.label = label;
-        this.description = description;
-        this.price = price;
-        this.color = color;
-        this.photo = photo;
-        this.size = size;
-        this.quantity = quantity;
-        this.categorie = categorie;
     }
 
     public CategorieDTO getCategorie() {
