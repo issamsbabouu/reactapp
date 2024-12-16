@@ -19,7 +19,9 @@ public class commande {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private produit product;
+    private Long deliverymanId;
 
+    private String status;
     private int quantity;
 
     public commande() {
@@ -65,4 +67,19 @@ public class commande {
         this.quantity = quantity;
     }
 
+    public Long getDeliverymanId() {
+        return deliverymanId;
+    }
+
+    public void setDeliverymanId(Long deliverymanId) {
+        this.deliverymanId = deliverymanId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

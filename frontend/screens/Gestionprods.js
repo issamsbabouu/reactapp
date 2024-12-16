@@ -68,16 +68,12 @@ const GestionProduit = ({ navigation }) => {
         if (newProduit.label && newProduit.price && newProduit.quantity && newProduit.categorieId) {
             try {
                 if (isEditing) {
-                    // Mettre à jour un produit existant
                     await axios.put(`${API_URL_PRODUCTS}/${selectedProduit.id}`, newProduit);
                     setIsEditing(false);
                     setSelectedProduit(null);
                 } else {
-                    // Ajouter un nouveau produit
                     await axios.post(API_URL_PRODUCTS, newProduit);
                 }
-
-                // Réinitialiser le formulaire après succès
                 setNewProduit({
                     label: '',
                     description: '',
@@ -86,10 +82,10 @@ const GestionProduit = ({ navigation }) => {
                     photo: '',
                     size: '',
                     quantity: '',
-                    categorieId: null
+                    categorieId: ''
                 });
                 setModalVisible(false);
-                fetchProduits(); // Rafraîchir la liste après ajout ou modification
+                fetchProduits();
             } catch (error) {
                 console.error('Erreur lors de l\'ajout ou modification du produit:', error);
                 alert('Une erreur est survenue. Vérifiez les données envoyées ou contactez l\'administrateur du serveur.');
@@ -102,19 +98,18 @@ const GestionProduit = ({ navigation }) => {
     const handleEditProduit = (produit) => {
         setNewProduit(produit);
         setSelectedProduit(produit);
-        setIsEditing(true);  // Set the editing state
-        setModalVisible(true);  // Open the modal
+        setIsEditing(true);
+        setModalVisible(true);
     };
 
     const handleDeleteProduit = async (produitId) => {
         try {
             await axios.delete(`${API_URL_PRODUCTS}/${produitId}`);
-            fetchProduits(); // Rafraîchir la liste après la suppression
+            fetchProduits();
         } catch (error) {
             console.error('Erreur lors de la suppression du produit:', error);
         }
     };
-
     return (
         <View style={styles.container}>
             {/* Menu Button */}
@@ -125,7 +120,7 @@ const GestionProduit = ({ navigation }) => {
             {/* Menu Visible */}
             {isMenuVisible && (
                 <View style={styles.menu}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('dashboard')}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Dashboard')}>
                         <Text style={styles.menuText}>Dashboard</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Gestioncateg')}>
@@ -164,6 +159,7 @@ const GestionProduit = ({ navigation }) => {
                 renderItem={({ item }) => (
                     <View style={styles.produitCard}>
                         <Text style={styles.produitLabel}>{item.label}</Text>
+                        <Text>{item.categorieId} </Text>
                         <Text>{item.price} MAD</Text>
                         <TouchableOpacity
                             style={styles.editButton}
@@ -199,6 +195,13 @@ const GestionProduit = ({ navigation }) => {
                             placeholder="Description"
                             value={newProduit.description}
                             onChangeText={(text) => setNewProduit({ ...newProduit, description: text })}
+                        />
+                        <Text style={styles.label}>Catégorie</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Description"
+                            value={newProduit.categorieId}
+                            onChangeText={(text) => setNewProduit({ ...newProduit, categorieId: text })}
                         />
                         <Text style={styles.label}>Prix</Text>
                         <TextInput

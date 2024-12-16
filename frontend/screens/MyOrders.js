@@ -39,13 +39,11 @@ const OrdersPage = () => {
     };
     const renderOrder = ({ item }) => (
         <View style={styles.orderCard}>
-            {item.photo ? (
-                <Image source={{ uri: item.photo }} style={styles.productImage} />
-            ) : (
-                <View style={styles.placeholderImage} />
-            )}
+            {/* If you have an image, replace it here */}
+            <View style={styles.placeholderImage} />
             <View style={styles.orderInfo}>
                 <Text style={styles.productName}>{item.productName || 'Unnamed Product'}</Text>
+                <Text style={styles.productPrice}>Price: Not Available</Text>
                 <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
             </View>
         </View>

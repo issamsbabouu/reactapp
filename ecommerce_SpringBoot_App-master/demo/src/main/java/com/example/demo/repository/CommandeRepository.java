@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CommandeRepository extends JpaRepository<commande, Long> {
+    List<commande> findByDeliverymanId(Long deliverymanId);
     List<commande> findByPanierId(int panierId);
     List<commande> findByPanier_CompteId(Long compteId);
 }

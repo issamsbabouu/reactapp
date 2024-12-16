@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import axios from 'axios';
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const MesCommentaires = () => {
   const [comments, setComments] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [isMenuVisible, setMenuVisible] = useState(false);
   useEffect(() => {
     fetchComments();
   }, []);
@@ -43,6 +44,31 @@ const MesCommentaires = () => {
 
   return (
       <View style={styles.container}>
+        <TouchableOpacity onPress={() => setMenuVisible(!isMenuVisible)} style={styles.menuButton}>
+          <Ionicons name="menu" size={30} color="black" />
+        </TouchableOpacity>
+
+        {/* Menu Visible */}
+        {isMenuVisible && (
+            <View style={styles.menu}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('dashboard')}>
+                <Text style={styles.menuText}>Dashboard</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Gestioncateg')}>
+                <Text style={styles.menuText}>Gestion des catégories</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('gusers')}>
+                <Text style={styles.menuText}>Gestion des utilisateurs</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('gestioncomment')}>
+                <Text style={styles.menuText}>Gestion des commentaires</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.menuText}>Se déconnecter</Text>
+              </TouchableOpacity>
+            </View>
+        )}
+
         <Text style={styles.header}>Gestion des Commentaires</Text>
         <TextInput
             style={styles.searchBar}
@@ -127,6 +153,30 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 5,
     marginTop: 10,
+  },
+  menu: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+    minWidth: 200,
+    zIndex: 1000,
+  },
+  menuItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#333',
   },
   buttonText: {
     color: '#fff',

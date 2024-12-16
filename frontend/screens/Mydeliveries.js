@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 
 const Mydeliveries = () => {
@@ -7,7 +7,7 @@ const Mydeliveries = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch orders from the backend
+    // Fetch orders for the connected deliveryman
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -16,7 +16,10 @@ const Mydeliveries = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await axios.get('http://localhost:8080/api/orders/commandes');
+            const response = await axios.get('http://127.0.0.1:8080/api/orders/livreur', {
+                withCredentials: true, // Ensure session cookies are sent
+            });
+            console.log(response.data);  // Log API response to inspect the data structure
             setOrders(response.data);
         } catch (error) {
             setError('Failed to fetch orders');
@@ -25,14 +28,9 @@ const Mydeliveries = () => {
         }
     };
 
-    const handleTakeDelivery = (orderId) => {
-        // Handle delivery action here
-        alert(`Order ${orderId} is being delivered`);
-    };
-
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Orders for Delivery</Text>
+            <Text style={styles.header}>Your Deliveries</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#4CAF50" />
             ) : error ? (
@@ -43,23 +41,18 @@ const Mydeliveries = () => {
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <View style={styles.card}>
-                            {item.product ? (
-                                <>
-                                    <Text style={styles.productText}>Product: {item.product.label}</Text>
-                                    <Text style={styles.productText}>Quantity: {item.quantity}</Text>
-                                </>
-                            ) : (
-                                <Text>No product data</Text>
-                            )}
-                            <TouchableOpacity
-                                style={styles.button}
-                                onPress={() => handleTakeDelivery(item.id)}
-                            >
-                                <Text style={styles.buttonText}>Take Delivery</Text>
-                            </TouchableOpacity>
+                            {/* Product Info */}
+                            <Text style={styles.productText}>Product: {item.productLabel || 'No product label available'}</Text>
+                            <Text style={styles.productText}>Quantity: {item.quantity || 'Unknown quantity'}</Text>
+
+                            {/* Client Info */}
+                            <Text style={styles.clientText}>Client Name: {item.clientName || 'Unknown Client'}</Text>
+                            <Text style={styles.clientText}>Client Phone: {item.clientPhone || 'Unknown Phone'}</Text>
+
                         </View>
                     )}
                 />
+
             )}
         </View>
     );
@@ -72,6 +65,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
     },
     header: {
+        marginTop: 50,
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
@@ -89,27 +83,15 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 3,
     },
-    cardTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
     productText: {
         fontSize: 16,
         color: '#555',
         marginBottom: 5,
     },
-    button: {
-        backgroundColor: '#4CAF50',
-        paddingVertical: 10,
-        borderRadius: 5,
-        marginTop: 15,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#fff',
+    clientText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 5,
     },
     errorText: {
         color: 'red',

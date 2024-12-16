@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
 import axios from 'axios';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from '@react-navigation/native';  // Import useNavigation hook
 
-const DeliveryPage = ({ navigation }) => {
+const DeliveryPage = ({ deliverymanId }) => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isMenuVisible, setMenuVisible] = useState(false);  // State for menu visibility
+    const [isMenuVisible, setMenuVisible] = useState(false);
+    const navigation = useNavigation();  // Initialize navigation hook
 
-    // Fetch orders from the backend
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -17,45 +17,43 @@ const DeliveryPage = ({ navigation }) => {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            setError(null);
             const response = await axios.get('http://localhost:8080/api/orders/commandes');
             setOrders(response.data);
         } catch (error) {
-            setError('Failed to fetch orders');
+            Alert.alert('Error', 'Failed to fetch orders');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleTakeDelivery = (orderId) => {
-        // Handle delivery action here
-        alert(`Order ${orderId} is being delivered`);
+    const handleTakeDelivery = async (orderId) => {
+        try {
+            const response = await axios.post(
+                'http://127.0.0.1:8080/api/orders/assign-deliveryman',
+                null,
+                {
+                    params: { orderId },
+                    withCredentials: true, // Ensures cookies (including the session ID) are sent with the request
+                }
+            );
+
+            alert(response.data.message); // Show success message
+            fetchOrders(); // Refresh the order list after taking delivery
+        } catch (error) {
+            console.error("Error assigning delivery:", error);
+            alert("Failed to take delivery. Please try again.");
+        }
+    };
+
+    const toggleMenu = () => {
+        setMenuVisible(prevState => !prevState);  // Toggle the menu visibility
     };
 
     return (
         <View style={styles.container}>
-            {/* Menu Button */}
-            <TouchableOpacity onPress={() => setMenuVisible(!isMenuVisible)} style={styles.menuButton}>
-                <Ionicons name="menu" size={30} color="black" />
-            </TouchableOpacity>
-
-            {/* Menu */}
-            {isMenuVisible && (
-                <View style={styles.menu}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('My deliveries')}>
-                        <Text style={styles.menuText}>My deliveries</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
-                        <Text style={styles.menuText}>Log out</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-
-            <Text style={styles.header}>Orders to Deliver</Text>
+            <Text style={styles.header}>Available Orders</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#4CAF50" />
-            ) : error ? (
-                <Text style={styles.errorText}>{error}</Text>
             ) : (
                 <FlatList
                     data={orders}
@@ -70,12 +68,21 @@ const DeliveryPage = ({ navigation }) => {
                             ) : (
                                 <Text>No product data</Text>
                             )}
-                            <TouchableOpacity
-                                style={styles.button}
-                                onPress={() => handleTakeDelivery(item.id)}
-                            >
-                                <Text style={styles.buttonText}>Take Delivery</Text>
-                            </TouchableOpacity>
+
+                            {/* Display the image only when the status is "TAKEN" */}
+                            {item.status === 'TAKEN' && (
+                                <Image source={{ uri: 'http://<your-ip-address>:8080/taken_order_image.jpg' }} style={styles.imaget} />
+                            )}
+
+                            {/* Conditionally render the "Take Delivery" button */}
+                            {item.status !== 'TAKEN' && (
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={() => handleTakeDelivery(item.id)}
+                                >
+                                    <Text style={styles.buttonText}>Take Delivery</Text>
+                                </TouchableOpacity>
+                            )}
                         </View>
                     )}
                 />
@@ -90,45 +97,11 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f9f9f9',
     },
-    menuButton: {
-        position: 'absolute',
-        top: 20,
-        left: 20,
-        zIndex: 10,
-        marginTop:20,
-        padding: 10,
-    },
-    menu: {
-        position: 'absolute',
-        top: 60,
-        left: 20,
-        backgroundColor: '#fff',
-        padding: 10,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 3,
-        minWidth: 200,
-        zIndex: 1000,
-    },
-    menuItem: {
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderBottomWidth: 1,
-        borderColor: '#ddd',
-    },
-    menuText: {
-        fontSize: 16,
-        color: '#333',
-    },
     header: {
+        marginTop:40,
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        textAlign: 'center',
-        color: '#333',
-        marginTop:60,
     },
     card: {
         backgroundColor: '#fff',
@@ -141,16 +114,11 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 3,
     },
-    productText: {
-        fontSize: 16,
-        color: '#555',
-        marginBottom: 5,
-    },
     button: {
         backgroundColor: '#4CAF50',
         paddingVertical: 10,
         borderRadius: 5,
-        marginTop: 15,
+        marginTop: 10,
         alignItems: 'center',
     },
     buttonText: {
@@ -158,10 +126,44 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    errorText: {
-        color: 'red',
-        textAlign: 'center',
-        marginTop: 20,
+    image: {
+        marginTop: 10,
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+        resizeMode: 'cover',
+    },
+    imaget: {
+        marginTop: 10,
+        width: '100%',
+        height: 70,
+        borderRadius: 10,
+        resizeMode: 'cover',
+    },
+    menuButton: {
+        marginTop:20,
+        padding: 10,
+    },
+    menu: {
+
+        position: 'absolute',
+        top: 50,
+        left: 0,
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        width: 200,
+        padding: 10,
+    },
+    menuItem: {
+        padding: 10,
+    },
+    menuText: {
+        fontSize: 16,
+    },
+    productText: {
+        fontSize: 16,
+        marginBottom: 5,
     },
 });
 

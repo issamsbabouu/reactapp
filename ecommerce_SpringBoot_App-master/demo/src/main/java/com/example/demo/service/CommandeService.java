@@ -2,7 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.modele.Panier;
 import com.example.demo.modele.commande;
+import com.example.demo.modele.comptes;
 import com.example.demo.repository.CommandeRepository;
+import com.example.demo.repository.CompteRepository;
 import com.example.demo.repository.PanierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,8 @@ public class CommandeService {
 
     @Autowired
     private PanierRepository panierRepository;
-
-    // CommandeService.java
+    @Autowired
+    private CompteRepository compteRepository;
     public void confirmerPanier(Long userId) {
         // Retrieve the user's basket
         Panier panier = (Panier) panierRepository.findByCompteId(userId);
@@ -47,5 +49,14 @@ public class CommandeService {
         }
         return commandeRepository.findByPanier_CompteId(userId);
     }
+    public List<commande> getCommandesByDeliverymanId(Long deliverymanId) {
+        // Query the database for orders assigned to this deliveryman
+        return commandeRepository.findByDeliverymanId(deliverymanId);
+    }
 
+    public boolean isDeliveryman(Long compteId) {
+        comptes compte = compteRepository.findById(compteId)
+                .orElseThrow(() -> new RuntimeException("Compte not found"));
+        return "deliveryman".equals(compte.getType());
+    }
 }

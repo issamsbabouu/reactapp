@@ -1,16 +1,25 @@
 package com.example.demo.DTO;
-
 public class CommandeResponse {
     private Long id;
-    private String productName;
+    private String productLabel;
     private int quantity;
-    private Long userId;
+    private Long clientId;
+    private String clientName;
+    private String clientPhone;  // Optional
 
-    public CommandeResponse(Long id, String productName, int quantity, Long userId) {
+    // Constructor with phone number (for /livreur)
+    public CommandeResponse(Long id, String productLabel, int quantity, Long clientId, String clientName, String clientPhone) {
         this.id = id;
-        this.productName = productName;
+        this.productLabel = productLabel;
         this.quantity = quantity;
-        this.userId = userId;
+        this.clientId = clientId;
+        this.clientName = clientName;
+        this.clientPhone = clientPhone;
+    }
+
+    // Constructor without phone number (for /user)
+    public CommandeResponse(Long id, String productLabel, int quantity, Long clientId, String clientName) {
+        this(id, productLabel, quantity, clientId, clientName, "");  // Provide an empty string or null for phone
     }
 
     public Long getId() {
@@ -21,12 +30,12 @@ public class CommandeResponse {
         this.id = id;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getProductLabel() {
+        return productLabel;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setProductLabel(String productLabel) {
+        this.productLabel = productLabel;
     }
 
     public int getQuantity() {
@@ -37,13 +46,28 @@ public class CommandeResponse {
         this.quantity = quantity;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getClientId() {
+        return clientId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
     }
-// Getters et setters
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public String getClientPhone() {
+        return clientPhone;
+    }
+
+    public void setClientPhone(String clientPhone) {
+        this.clientPhone = clientPhone;
+    }
 }
 
