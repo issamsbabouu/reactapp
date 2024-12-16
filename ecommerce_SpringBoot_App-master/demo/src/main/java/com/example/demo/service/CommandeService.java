@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.DTO.CommandeDTO;
+import com.example.demo.modele.Panier;
 import com.example.demo.modele.commande;
 import com.example.demo.repository.CommandeRepository;
-import com.example.demo.repository.ProduitRepository;
+import com.example.demo.repository.PanierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CommandeService {
@@ -14,26 +16,36 @@ public class CommandeService {
     private CommandeRepository commandeRepository;
 
     @Autowired
-    private ProduitRepository produitRepository;  // Assuming you're fetching products by their IDs (if needed)
+    private PanierRepository panierRepository;
 
-    public CommandeDTO createOrder(CommandeDTO commandeDTO) {
-        // Create a new commande object and populate its fields from the DTO
-        commande newOrder = new commande();
-        newOrder.setDateLivraison(commandeDTO.getDateLivraison());  // Assuming this is a date, update accordingly
-        newOrder.setLieuLivraison(commandeDTO.getDeliveryAddress());  // Correct the method name to get the address
+    // CommandeService.java
+    public void confirmerPanier(Long userId) {
+        // Retrieve the user's basket
+        Panier panier = (Panier) panierRepository.findByCompteId(userId);
+        if (panier == null) {
+            throw new RuntimeException("No basket found for this user");
+        }
 
-        // If you're adding products, you may need to handle them here
-        // Example:
-        // newOrder.setProduit(produitRepository.findById(commandeDTO.getProductId()).orElse(null));
+        // Create a command for each item in the basket
+        for (commande panierCommande : panier.getCommandes()) {
+            commande newCommande = new commande();
+            newCommande.setPanier(panier);
+            newCommande.setProduct(panierCommande.getProduct());
+            newCommande.setQuantity(panierCommande.getQuantity());
+            commandeRepository.save(newCommande);
+        }
 
-        // Save the new order to the repository
-        commande savedOrder = commandeRepository.save(newOrder);
-
-        // Return a DTO with the saved order data
-        return new CommandeDTO(
-                savedOrder.getId(),
-                savedOrder.getDateLivraison(),
-                savedOrder.getLieuLivraison()
-        );
+        panier.getCommandes().clear();
+        panierRepository.save(panier);  // Save the empty basket
     }
+    public List<commande> getAllCommandes() {
+        return commandeRepository.findAll(); // Fetch all commandes from the database
+    }
+    public List<commande> getCommandesByUserId(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("L'ID utilisateur est nul.");
+        }
+        return commandeRepository.findByPanier_CompteId(userId);
+    }
+
 }

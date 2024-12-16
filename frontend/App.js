@@ -2,22 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import ProductListScreen from './screens/ProductListScreen';
-import LoginScreen from './screens/LoginScreen';
-import GestionUsersadmn from './screens/GestionUsersadmn';
-import Gestionprods from './screens/Gestionprods';
-import GestionCateg from './screens/GestionCateg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { StyleSheet } from 'react-native';
+import ProductListScreen from './screens/ProductListScreen';
+import LoginScreen from './screens/LoginScreen';
 import Dashboard from './screens/Dashboard';
-import GestionCommentaires from './screens/GestionCommentaire';
+import SettingsScreen from "./screens/SettingsScreen";
+import SplashScreen from './screens/SplashScreen';
+import OrderFormScreen from './screens/OrderFormScreen';
+import BasketPage from './screens/BasketPage';
+import OrdersPage from './screens/MyOrders';
+import DeliveryPage from './screens/LivreurScreen';
+import UserComments from './screens/MesComments';
+import Mydeliveries from "./screens/Mydeliveries";
 import SignUp from "./screens/SignUp";
 import SignUpp from "./screens/SignUpDeliveryman";
-import UserComments from "./screens/MesComments"; // Ensure this is the correct import
-import MyOrders from "./screens/MyOrders";
-import SettingsScreen from "./screens/SettingsScreen";
-import SplashScreen from "./screens/SplashScreen";
-import OrderFormScreen from "./screens/OrderFormScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,15 +39,23 @@ const TabNavigator = () => (
             }}
         />
         <Tab.Screen
-            name="My Orders"
-            component={MyOrders}
+            name="My basket"
+            component={BasketPage}
             options={{
                 tabBarIcon: ({ color, size }) => <Ionicons name="cart-outline" size={size} color={color} />,
                 headerShown: false,
             }}
         />
         <Tab.Screen
-            name="Mes Commentaires"
+            name="My Orders"
+            component={OrdersPage}
+            options={{
+                tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" size={size} color={color} />,
+                headerShown: false,
+            }}
+        />
+        <Tab.Screen
+            name="My Comments"
             component={UserComments}
             options={{
                 tabBarIcon: ({ color, size }) => <Ionicons name="chatbubble-outline" size={size} color={color} />,
@@ -63,11 +70,39 @@ const TabNavigator = () => (
                 headerShown: false,
             }}
         />
+    </Tab.Navigator>
+);
+
+// Tab Navigator for deliveryman
+const TabNavigatorDeliveryMan = () => (
+    <Tab.Navigator
+        screenOptions={{
+            tabBarActiveTintColor: '#4CAF50',
+            tabBarInactiveTintColor: 'gray',
+            tabBarStyle: { backgroundColor: '#fff' },
+        }}
+    >
         <Tab.Screen
-            name="Logout"
+            name="Orders"
+            component={DeliveryPage}
+            options={{
+                tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" size={size} color={color} />,
+                headerShown: false,
+            }}
+        />
+        <Tab.Screen
+            name="My deliveries"
+            component={Mydeliveries} // Or a specific screen for delivered orders
+            options={{
+                tabBarIcon: ({ color, size }) => <Ionicons name="checkmark-done-outline" size={size} color={color} />,
+                headerShown: false,
+            }}
+        />
+        <Tab.Screen
+            name="logout"
             component={LoginScreen}
             options={{
-                tabBarIcon: ({ color, size }) => <Ionicons name="log-out-outline" size={size} color={color} />,
+                tabBarIcon: ({ color, size }) => <Ionicons name="logout-outline" size={size} color={color} />,
                 headerShown: false,
             }}
         />
@@ -78,64 +113,57 @@ const App = () => {
     const [userType, setUserType] = useState(null); // State to store user type
 
     useEffect(() => {
-        // Fetch user data (you could get this from a login or authentication API)
-        const user = { type: 'client' }; // This is just an example. Replace with actual logic
+        // Simulating a login or fetching user data (replace with actual logic)
+        const user = { type: 'deliveryman' }; // Replace with actual logic to fetch the user type
         setUserType(user.type); // Set user type when fetched
     }, []);
 
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="SplashScreen">
-                <Stack.Screen name="SplashScreen" component={SplashScreen}
-                              options={{ headerShown: false }}/>
+                <Stack.Screen
+                    name="SplashScreen"
+                    component={SplashScreen}
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen
                     name="Login"
                     component={LoginScreen}
                     options={{ headerShown: false }}
                 />
-                {/* Only show TabNavigator if user is a client */}
+                {/* If user type is 'client', show TabNavigator */}
                 {userType === 'client' && (
                     <Stack.Screen
                         name="Home"
-                        component={ProductListScreen}
+                        component={TabNavigator}  // Show TabNavigator for clients
                         options={{ headerShown: false }}
                     />
-
                 )}
+                {/* If user type is 'deliveryman', show TabNavigatorDeliveryMan */}
+                {userType === 'livreur' && (
+                    <Stack.Screen
+                        name="Home"
+                        component={TabNavigatorDeliveryMan}  // Show TabNavigator for deliveryman
+                        options={{ headerShown: false }}
+                    />
+                )}
+                {/* Admin or other user types, show respective screens */}
+                {userType === 'admin' && (
+                    <Stack.Screen
+                        name="Dashboard"
+                        component={Dashboard}
+                        options={{ headerShown: false }}
+                    />
+                )}
+                {/* Other screens for both users */}
                 <Stack.Screen
-                    name="gusers"
-                    component={GestionUsersadmn}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="mescommentaires"
-                    component={UserComments}
+                    name="commandes"
+                    component={DeliveryPage}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
                     name="parametres"
                     component={SettingsScreen}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen name="OrderForm" component={OrderFormScreen} options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="Gestionprods"
-                    component={Gestionprods}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Gestioncateg"
-                    component={GestionCateg}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="dashboard"
-                    component={Dashboard}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="gestioncomment"
-                    component={GestionCommentaires}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

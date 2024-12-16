@@ -28,8 +28,6 @@ public class produit {
     @ManyToOne
     @JoinColumn(name="category_id")  // La colonne qui fait référence à la catégorie dans la table des produits
     private categorie categorie;
-    @OneToMany(mappedBy = "p")
-    private List<commande> command;
     @OneToMany(mappedBy = "produit", cascade = CascadeType.ALL)
     private List<Comment> comments;
     @OneToMany(mappedBy = "produit", fetch = FetchType.EAGER)
@@ -52,13 +50,6 @@ public class produit {
 
     public produit() {}
 
-    public List<commande> getCommand() {
-        return command;
-    }
-
-    public void setCommand(List<commande> command) {
-        this.command = command;
-    }
 
     public List<Rating> getRatings() {
         return ratings;

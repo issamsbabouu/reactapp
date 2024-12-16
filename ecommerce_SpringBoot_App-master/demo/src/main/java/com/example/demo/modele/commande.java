@@ -1,29 +1,38 @@
 package com.example.demo.modele;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 
+
+@Entity
 public class commande {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String clientName;
-    private String deliveryAddress;
-    private List<Long> productIds;  // Assuming product IDs are a list of Longs
+
+    @ManyToOne
+    @JoinColumn(name = "panier_id")
+    @JsonBackReference
+    private Panier panier;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private produit product;
+
     private int quantity;
-    private String livreurName;
 
-    // No-argument constructor for Jackson
-    public commande() {}
-
-    // Constructor to easily create a DTO from the entity
-    public commande(Long id, String clientName, String deliveryAddress, List<Long> productIds, int quantity, String livreurName) {
-        this.id = id;
-        this.clientName = clientName;
-        this.deliveryAddress = deliveryAddress;
-        this.productIds = productIds;
-        this.quantity = quantity;
-        this.livreurName = livreurName;
+    public commande() {
     }
 
-    // Getters and setters for all fields
+    public commande(produit product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
+
+    public commande(Long productId, int quantity) {
+    }
+
     public Long getId() {
         return id;
     }
@@ -32,28 +41,20 @@ public class commande {
         this.id = id;
     }
 
-    public String getClientName() {
-        return clientName;
+    public Panier getPanier() {
+        return panier;
     }
 
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
+    public void setPanier(Panier panier) {
+        this.panier = panier;
     }
 
-    public String getDeliveryAddress() {
-        return deliveryAddress;
+    public produit getProduct() {
+        return product;
     }
 
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
-    public List<Long> getProductIds() {
-        return productIds;
-    }
-
-    public void setProductIds(List<Long> productIds) {
-        this.productIds = productIds;
+    public void setProduct(produit product) {
+        this.product = product;
     }
 
     public int getQuantity() {
@@ -64,11 +65,4 @@ public class commande {
         this.quantity = quantity;
     }
 
-    public String getLivreurName() {
-        return livreurName;
-    }
-
-    public void setLivreurName(String livreurName) {
-        this.livreurName = livreurName;
-    }
 }

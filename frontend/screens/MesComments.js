@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import {View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image} from 'react-native';
 import axios from 'axios';
 
-const MesCommentaires = () => {
+const UserComments = () => {
     const [comments, setComments] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -12,14 +12,15 @@ const MesCommentaires = () => {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/comments');
+            const response = await axios.get('http://127.0.0.1:8080/api/comments/user', {
+                withCredentials: true  // Inclure les cookies de session
+            });
             console.log('Comments fetched:', response.data);
             setComments(response.data);
         } catch (error) {
-            console.error('Error fetching comments:', error);
+            console.error('Error fetching comments:', error.response ? error.response.data : error);
         }
     };
-
     const deleteComment = async (commentId) => {
         try {
             await axios.delete(`http://localhost:8080/api/comments/admin/comments/${commentId}`);
@@ -31,7 +32,6 @@ const MesCommentaires = () => {
             console.error('Error deleting comment:', error);
         }
     };
-
     const handleSearch = (text) => {
         setSearchQuery(text);
     };
@@ -43,7 +43,7 @@ const MesCommentaires = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Gestion des Commentaires</Text>
+            <Text style={styles.header}>My comments</Text>
             <TextInput
                 style={styles.searchBar}
                 placeholder="Rechercher par utilisateur"
@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+        backgroundColor: '#f9f9f9',
         marginTop: 50,
-        backgroundColor: '#f5f5f5',
     },
     header: {
         fontSize: 24,
@@ -133,4 +133,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MesCommentaires;
+export default UserComments;

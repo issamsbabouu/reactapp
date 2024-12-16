@@ -4,7 +4,6 @@ import com.example.demo.controller.CategorieController;
 import com.example.demo.controller.ProduitController;
 import com.example.demo.controller.ComptesController;
 import com.example.demo.modele.*;
-import com.example.demo.repository.PanierRepository;
 import com.example.demo.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,22 +19,17 @@ public class DemoApplication {
 	private static CategorieService cat=null;
 	private static ComptesController ComptesController=null;
 	private static ComptesService DaoComptes=null;
-	private static CommandeService cs=null;
-	private static PanierRepository pr=null;
-	private static RatingService rs=null;
 	private static ReclamationService recs=null;
 
 
-	public DemoApplication(ReclamationService recs,RatingService rs, ProduitService produitService, CategorieService c, PanierRepository pr , CommandeService cs , ProduitController produitController, CategorieController categorieController, ComptesController ComptesController, ComptesService DaoComptes) {
+	public DemoApplication(ReclamationService recs, ProduitService produitService, CategorieService c,  ProduitController produitController, CategorieController categorieController, ComptesController ComptesController, ComptesService DaoComptes) {
 		this.produitService = produitService;
 		this.produitController = produitController;
 		this.categorieController = categorieController;
 		this.ComptesController = ComptesController;
 		this.DaoComptes = DaoComptes;
-		this.cs=cs;
+
 		this.cat=c;
-		this.pr=pr;
-		this.rs=rs;
 		this.recs=recs;
 	}
 
@@ -167,10 +161,6 @@ public class DemoApplication {
 			System.out.println("Erreur lors de la mise à jour du compte!");
 		}
 	}*/
-	public static void test2(){
-int c = rs.getAvg(4);
-System.out.println(c);
-	}
 	public static void test(){
 Reclamation c = new Reclamation();
 recs.deleteReclam(26);

@@ -33,16 +33,11 @@ public class ComptesService {
         String token = role.equals("client") ? "client-token" :
                 role.equals("admin") ? "admin-token" :
                         role.equals("livreur") ? "livreur-token" : null;
-
         if (token == null) {
             throw new IllegalArgumentException("Invalid role");
         }
-
-        // Retourne également l'ID de l'utilisateur pour le stockage en session
-        return new LoginResponse(user.getId(), "Login successful", token, role);
+        return new LoginResponse((long) user.getId(), "Login successful", token, role);
     }
-
-
     public List<comptes> findByType(String type){
         return compteRepository.findAllByType(type);
     }
@@ -52,8 +47,9 @@ public class ComptesService {
                 .map(this::convertToDTO)  // Convertit chaque utilisateur en DTO
                 .collect(Collectors.toList());
     }
-
-    // Supprimer un utilisateur par ID
+    public Optional<comptes> getCompteById(Long id) {
+        return compteRepository.findById(id);
+    }
     public void deleteCompte(int id) {
         compteRepository.deleteById((long) id);
     }

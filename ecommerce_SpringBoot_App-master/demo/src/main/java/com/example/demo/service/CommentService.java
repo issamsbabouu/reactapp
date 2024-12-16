@@ -37,11 +37,12 @@ public class CommentService {
         }
     }
     public List<Comment> getCommentsByUser(Long compteId) {
-        // Fetch comments from the repository
+        // Recherche des commentaires associés à l'ID du compte
         List<Comment> comments = commentRepository.findByCompteId(compteId);
 
-        // Log the result
-        System.out.println("Comments fetched from DB: " + comments);
+        // Vous pouvez ajouter des logs pour vérifier que les commentaires sont récupérés correctement
+        System.out.println("Commentaires récupérés pour l'utilisateur avec ID: " + compteId);
+        comments.forEach(comment -> System.out.println("Commentaire: " + comment.getContent()));
 
         return comments;
     }

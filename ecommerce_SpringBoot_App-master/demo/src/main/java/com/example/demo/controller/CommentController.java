@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.DTO.CommentDTO;
+import com.example.demo.DTO.ProduitDTO;
 import com.example.demo.modele.Comment;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.service.CommentService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -38,32 +40,30 @@ public class CommentController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); // Return 404 Not Found if the comment is not found
         }
-    }@GetMapping("/user")
-    public ResponseEntity<List<Comment>> getCommentsForUser(HttpSession session) {
+    }
+    @GetMapping("/user")
+    public ResponseEntity<List<CommentDTO>> getCommentsForUser(HttpSession session) {
         Long compteId = (Long) session.getAttribute("compteId");
 
-        // Log to see if the user is authenticated correctly (session value)
-        System.out.println("User ID from session: " + compteId);
-
         if (compteId == null) {
-            // User is not logged in or session expired
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(401).body(null);  // Utilisateur non connecté
         }
 
-        // Fetch comments from the database
+        // Récupérer les commentaires de l'utilisateur connecté
         List<Comment> comments = commentService.getCommentsByUser(compteId);
+        List<CommentDTO> commentDTOs = comments.stream().map(comment -> new CommentDTO(
+                comment.getId(),
+                comment.getContent(),
+                comment.getCompte().getUsername(),
+                new ProduitDTO(
+                        comment.getProduit().getId(),
+                        comment.getProduit().getLabel(),
+                        comment.getProduit().getPrice(),
+                        comment.getProduit().getPhoto()
+                )
+        )).collect(Collectors.toList());
 
-        // Log the fetched comments
-        System.out.println("Fetched comments: " + comments);
-
-        if (comments.isEmpty()) {
-            // Return a 204 No Content if no comments exist
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-
-        return ResponseEntity.ok(comments);
+        return ResponseEntity.ok(commentDTOs);
     }
-
-
 
 }

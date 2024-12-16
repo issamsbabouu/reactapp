@@ -1,53 +1,60 @@
 package com.example.demo.modele;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
 @Entity
-@Table(name ="panier")
 public class Panier {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
+
+    @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<commande> commandes = new ArrayList<>();
+
     @ManyToOne
-    @JoinColumn(name="customer_id")
+    @JoinColumn(name = "compte_id")
     private comptes compte;
 
-    @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<commande> commandes;
+    public Panier() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public List<commande> getCommandes() {
         return commandes;
     }
-
 
     public void setCommandes(List<commande> commandes) {
         this.commandes = commandes;
     }
 
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
     public comptes getCompte() {
         return compte;
     }
+
     public void setCompte(comptes compte) {
         this.compte = compte;
     }
-    public Panier() {
+    public void addProduct(produit product, int quantity) {
+        commandes.add(new commande(product, quantity));
+    }
+    public void addCommande(commande commande) {
+        if (commande != null) {
+            commandes.add(commande);
+            commande.setPanier(this);  // Set the Panier reference in the Commande
+        }
     }
 
-    public Panier(int id, comptes compte, List<commande> commandes) {
-        this.id = id;
-        this.commandes=commandes;
-        this.compte = compte;
-    }
-    @Override
-    public String toString() {
-        return "Panier{" +
-                "id=" + id +
-                ", compte=" + compte +
-                ", commandes=" + commandes;
-    }
 }

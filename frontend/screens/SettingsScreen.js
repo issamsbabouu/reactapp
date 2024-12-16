@@ -50,13 +50,14 @@ const SettingsScreen = () => {
 
   const renderLanguageItem = ({ item }) => (
       <TouchableOpacity style={styles.languageOption}>
-        <Text style={[styles.languageText, isDarkMode && styles.darkText]}>{item.title}</Text>
+        <Text style={styles.languageText}>{item.title}</Text>
       </TouchableOpacity>
   );
 
+
   return (
-      <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-        <Text style={[styles.header, isDarkMode && styles.darkHeader]}>Paramètres</Text>
+      <View style={styles.container}>
+        <Text style={styles.header}>Paramètres</Text>
         {settingsOptions.map(option => (
             <TouchableOpacity key={option.id} style={styles.option} onPress={() => {
               if (option.id === '1') handleThemePress();
@@ -64,14 +65,13 @@ const SettingsScreen = () => {
               if (option.id === '5') handleAboutPress();
               if (option.id === '6') handleDeleteAccountPress();
             }}>
-              <Text style={[styles.optionText, isDarkMode && styles.darkText]}>{option.title}</Text>
+              <Text style={styles.optionText}>{option.title}</Text>
             </TouchableOpacity>
         ))}
 
         {/* Theme Modal */}
         <Modal transparent={true} visible={modalVisible} animationType="slide">
           <View style={styles.modalContainer}>
-            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>Choisir un thème</Text>
             <TouchableOpacity
                 style={[styles.button, styles.lightButton]}
                 onPress={() => setModalVisible(false)}
@@ -79,8 +79,7 @@ const SettingsScreen = () => {
               <Text style={styles.buttonText}>Clair</Text>
             </TouchableOpacity>
             <TouchableOpacity
-                style={[styles.button, styles.darkButton]}
-                onPress={toggleTheme} // Activate dark mode
+                style={[styles.button, styles.darkButton]} // Activate dark mode
             >
               <Text style={styles.buttonText}>Sombre</Text>
             </TouchableOpacity>
@@ -96,7 +95,7 @@ const SettingsScreen = () => {
         {/* Language Modal */}
         <Modal transparent={true} visible={languageModalVisible} animationType="slide">
           <View style={styles.modalContainer}>
-            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>Choisir une langue</Text>
+            <Text style={styles.modalHeader}>Choisir une langue</Text>
             <FlatList
                 data={languageOptions}
                 renderItem={renderLanguageItem}
@@ -115,8 +114,8 @@ const SettingsScreen = () => {
         {/* About Modal */}
         <Modal transparent={true} visible={aboutModalVisible} animationType="slide">
           <View style={styles.modalContainer}>
-            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>À propos de l'application</Text>
-            <Text style={[styles.aboutText, isDarkMode && styles.darkAboutText]}>{aboutText}</Text>
+            <Text style={styles.modalHeader}>À propos de l'application</Text>
+            <Text style={styles.aboutText}>{aboutText}</Text>
             <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setAboutModalVisible(false)}
@@ -129,7 +128,7 @@ const SettingsScreen = () => {
         {/* Delete Account Modal */}
         <Modal transparent={true} visible={deleteModalVisible} animationType="slide">
           <View style={styles.modalContainer}>
-            <Text style={[styles.modalHeader, isDarkMode && styles.darkModalHeader]}>Êtes-vous sûr de vouloir supprimer votre compte ?</Text>
+            <Text style={styles.modalHeader}>Êtes-vous sûr de vouloir supprimer votre compte ?</Text>
             <TouchableOpacity
                 style={[styles.button, styles.lightButton]}
                 onPress={handleDeleteConfirm}
@@ -162,6 +161,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
   },
   darkHeader: {
     color: 'white',

@@ -23,12 +23,6 @@ public class comptes {
     private String nom;
     private String filiere;
     private String status;
-    @OneToMany(mappedBy = "compte", cascade = CascadeType.ALL)
-    private List<Panier> paniers;
-    @OneToMany(mappedBy = "compte", cascade = CascadeType.ALL)
-    private List<commande> commandes;
-    @OneToMany(mappedBy = "deliveryman", cascade = CascadeType.ALL)
-    private List<commande> commandesd;
     @OneToMany(mappedBy = "compte")
     private List<Rating> ratings;
 
@@ -112,11 +106,11 @@ public class comptes {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         comptes comptes = (comptes) o;
-        return id == comptes.id && phone == comptes.phone && Objects.equals(username, comptes.username) && Objects.equals(email, comptes.email) && Objects.equals(password, comptes.password) && Objects.equals(type, comptes.type) && Objects.equals(photo, comptes.photo) && Objects.equals(nom, comptes.nom) && Objects.equals(filiere, comptes.filiere) && Objects.equals(commandes, comptes.commandes);
+        return id == comptes.id && phone == comptes.phone && Objects.equals(username, comptes.username) && Objects.equals(email, comptes.email) && Objects.equals(password, comptes.password) && Objects.equals(type, comptes.type) && Objects.equals(photo, comptes.photo) && Objects.equals(nom, comptes.nom) && Objects.equals(filiere, comptes.filiere) ;
     }
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, email, phone, password, type, photo, nom, filiere, commandes);
+        return Objects.hash(id, username, email, phone, password, type, photo, nom, filiere);
     }
 
 }

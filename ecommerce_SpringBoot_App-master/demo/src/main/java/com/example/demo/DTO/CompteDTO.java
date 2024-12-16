@@ -1,16 +1,15 @@
 package com.example.demo.DTO;
 
 public class CompteDTO {
-    private int id;
+    private Integer id;           // Changement de int à Integer pour permettre les valeurs nulles
     private String username;
     private String email;
     private String nom;
     private String type;
-    private int phone;
+    private Integer phone;        // Changement de int à Integer pour la même raison
 
-
-
-    public CompteDTO(int id, String username, String email, String nom, String type, int phone) {
+    // Constructeur
+    public CompteDTO(Integer id, String username, String email, String nom, String type, Integer phone) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -19,20 +18,12 @@ public class CompteDTO {
         this.phone = phone;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-
-    public int getId() {
+    // Getters et Setters
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -59,8 +50,20 @@ public class CompteDTO {
     public void setNom(String nom) {
         this.nom = nom;
     }
-    public int getPhone() {
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Integer getPhone() {
         return phone;
     }
 
+    public void setPhone(Integer phone) {
+        this.phone = phone;
+    }
 }
