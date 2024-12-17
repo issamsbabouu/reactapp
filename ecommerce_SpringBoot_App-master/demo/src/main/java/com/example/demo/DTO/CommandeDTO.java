@@ -8,12 +8,15 @@ public class CommandeDTO {
     private String photo;
     private int quantity;
     private Long productId;
-    public CommandeDTO(Long id, String label, double price, String photo, int quantity) {
+    public CommandeDTO(Long id, String label, String price, String photo, int quantity) {
         this.id = id;
         this.label = label;
-        this.price = price;
+        this.price = Double.parseDouble(String.valueOf(price));
         this.photo = photo;
         this.quantity = quantity;
+    }
+
+    public CommandeDTO(Long id, String label, double price, String photo, int quantity) {
     }
 
     // Getter and Setter methods

@@ -23,7 +23,7 @@ const LoginScreen = ({ navigation }) => {
       } else if (type === "admin") {
         navigation.navigate("gusers");
       } else if (type === "livreur") {
-        navigation.navigate("deliveries");
+        navigation.navigate("Order");
       } else {
         console.error("Unexpected role type:", type);
         alert('Invalid role: ' + type);

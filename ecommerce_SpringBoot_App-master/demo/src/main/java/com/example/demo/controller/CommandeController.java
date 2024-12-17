@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -51,8 +52,6 @@ public class CommandeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No orders found for the deliveryman.");
         }
-
-        // Convert commandes to CommandeResponse safely
         List<CommandeResponse> responseList = commandes.stream()
                 .map(commande -> {
                     // Log for debugging
@@ -112,14 +111,32 @@ public class CommandeController {
 
         // Convertir les commandes en CommandeResponse pour une réponse plus claire
         return commandes.stream()
-                .map(commande -> new CommandeResponse(
-                        commande.getId(),
-                        commande.getProduct().getLabel(),
-                        commande.getQuantity(),
-                        (long) commande.getPanier().getCompte().getId(),
-                        commande.getPanier().getCompte().getNom()))
-                .toList();
+                .map(commande -> {
+                    // Safely handle null values for product
+                    String productLabel = "Produit inconnu";
+                    if (commande.getProduct() != null) {
+                        productLabel = commande.getProduct().getLabel();
+                    }
+
+                    // Safely handle null values for panier and compte
+                    Long panierCompteId = null;
+                    String panierCompteNom = "Inconnu";
+                    if (commande.getPanier() != null && commande.getPanier().getCompte() != null) {
+                        panierCompteId = (long) commande.getPanier().getCompte().getId();
+                        panierCompteNom = commande.getPanier().getCompte().getNom();
+                    }
+
+                    return new CommandeResponse(
+                            commande.getId(),
+                            productLabel,
+                            commande.getQuantity(),
+                            panierCompteId,
+                            panierCompteNom
+                    );
+                })
+                .collect(Collectors.toList());
     }
+
     @GetMapping("/commandes")
     public List<commande> getAllCommandes() {
         List<commande> commandes = commandeService.getAllCommandes();

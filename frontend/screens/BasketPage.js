@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image, ActivityIndicator } from 'react-native';
 import axios from 'axios';
+import Ionicons from "react-native-vector-icons/Ionicons";  // For the menu icon
 
-const BasketPage = () => {
+const BasketPage = ({ navigation }) => {
     const [basket, setBasket] = useState([]);  // Initialize basket as an empty array
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isMenuVisible, setMenuVisible] = useState(false);  // For menu visibility
 
     useEffect(() => {
         fetchBasket();
@@ -92,6 +94,7 @@ const BasketPage = () => {
             alert('Error confirming order');
         }
     };
+
     const clearBasket = async () => {
         try {
             await axios.post('http://127.0.0.1:8080/api/panier/clear', {}, {
@@ -102,8 +105,39 @@ const BasketPage = () => {
             console.error('Error clearing basket on backend:', error.response ? error.response.data : error);
         }
     };
+
+    const handleMenuToggle = () => {
+        setMenuVisible(!isMenuVisible);
+    };
+
     return (
         <View style={styles.container}>
+            {/* Menu Button */}
+            <TouchableOpacity onPress={handleMenuToggle} style={styles.menuButton}>
+                <Ionicons name="menu" size={30} color="black" />
+            </TouchableOpacity>
+
+            {/* Menu Visible */}
+            {isMenuVisible && (
+                <View style={styles.menu}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Home')}>
+                        <Text style={styles.menuText}>Catalog</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Settingsapp')}>
+                        <Text style={styles.menuText}>Settings</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('myord')}>
+                        <Text style={styles.menuText}>My orders</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('mycom')}>
+                        <Text style={styles.menuText}>My comments</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
+                        <Text style={styles.menuText}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
             <Text style={styles.header}>My Basket</Text>
             <TextInput
                 style={styles.searchBar}
@@ -128,7 +162,7 @@ const BasketPage = () => {
                             )}
                             <View style={styles.productInfo}>
                                 <Text style={styles.productName}>{item.label || 'No Name'}</Text>
-                                <Text style={styles.productPrice}>${item.price || 'N/A'}</Text>
+                                <Text style={styles.productPrice}>MAD{item.price || 'N/A'}</Text>
                                 <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
                                 <TouchableOpacity
                                     style={styles.deleteButton}
@@ -150,6 +184,7 @@ const BasketPage = () => {
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -221,6 +256,38 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginTop: 20,
         alignItems: 'center',
+    },
+    menuButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        backgroundColor: '#fff',
+        padding: 10,
+        borderRadius: 30,
+    },
+    menu: {
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        backgroundColor: '#fff',
+        padding: 10,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 3,
+        minWidth: 200,
+        zIndex: 1000,
+    },
+    menuItem: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        borderColor: '#ddd',
+    },
+    menuText: {
+        fontSize: 16,
+        color: '#333',
     },
 });
 

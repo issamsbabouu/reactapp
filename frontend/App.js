@@ -16,7 +16,10 @@ import SignUp from "./screens/SignUp";
 import SignUpp from "./screens/SignUpDeliveryman";
 import CommentsPage from "./screens/MesComments";
 import DeliveryPage from "./screens/LivreurScreen";
-import Mydeliveries from "./screens/Mydeliveries"; // Ensure this is the correct import
+import Mydeliveries from "./screens/Mydeliveries";
+import BasketPage from "./screens/BasketPage";
+import OrdersPage from "./screens/MyOrders";
+import UserComments from "./screens/MesComments"; // Ensure this is the correct import
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,7 +33,7 @@ const TabNavigator = () => (
         }}
     >
         <Tab.Screen
-            name="Accueil"
+            name="Home"
             component={ProductListScreen}
             options={{ headerShown: false }}
         />
@@ -114,6 +117,27 @@ const App = () => {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="mycom"
+                    component={UserComments}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Settingsapp"
+                    component={SettingsScreen}
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name="basket"
+                    component={BasketPage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="myord"
+                    component={OrdersPage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="gusers"
                     component={GestionUsersadmn}
                     options={{ headerShown: false }}
@@ -155,6 +179,11 @@ const App = () => {
                 />
                 <Stack.Screen
                     name="Orders"
+                    component={OrdersPage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Order"
                     component={DeliveryPage}
                     options={{ headerShown: false }}
                 />

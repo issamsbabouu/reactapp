@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import Ionicons from "react-native-vector-icons/Ionicons";  // For the menu icon
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
 const OrdersPage = () => {
     const [orders, setOrders] = useState([]); // Liste des commandes
     const [loading, setLoading] = useState(true); // Indicateur de chargement
     const [error, setError] = useState(null); // Gestion des erreurs
+    const [isMenuVisible, setMenuVisible] = useState(false); // For menu visibility
+    const navigation = useNavigation(); // Use the useNavigation hook to access navigation
 
     // Charger les commandes au montage du composant
     useEffect(() => {
@@ -39,18 +43,57 @@ const OrdersPage = () => {
     };
     const renderOrder = ({ item }) => (
         <View style={styles.orderCard}>
-            {/* If you have an image, replace it here */}
-            <View style={styles.placeholderImage} />
+            {/* Display product image if available, fallback to placeholder */}
+            {item.productPhoto ? (
+                <Image source={{ uri: item.productPhoto }} style={styles.productImage} />
+            ) : (
+                <View style={styles.placeholderImage} />
+            )}
+
             <View style={styles.orderInfo}>
-                <Text style={styles.productName}>{item.productName || 'Unnamed Product'}</Text>
-                <Text style={styles.productPrice}>Price: Not Available</Text>
+                {/* Display product label (name) */}
+                <Text style={styles.productName}>{item.productLabel || 'Unnamed Product'}</Text>
+                {/* Price - If available */}
+                <Text style={styles.productPrice}>{item.productPrice ? `Price: ${item.productPrice}` : 'Price: Not Available'}</Text>
+                {/* Quantity */}
                 <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
             </View>
         </View>
     );
 
+
+    const handleMenuToggle = () => {
+        setMenuVisible(!isMenuVisible);
+    };
+
     return (
         <View style={styles.container}>
+            {/* Menu Button */}
+            <TouchableOpacity onPress={handleMenuToggle} style={styles.menuButton}>
+                <Ionicons name="menu" size={30} color="black" />
+            </TouchableOpacity>
+
+            {/* Menu Visible */}
+            {isMenuVisible && (
+                <View style={styles.menu}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Home')}>
+                        <Text style={styles.menuText}>Catalog</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('basket')}>
+                        <Text style={styles.menuText}>My basket</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('mycom')}>
+                        <Text style={styles.menuText}>My comments</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Settingsapp')}>
+                        <Text style={styles.menuText}>Settings</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
+                        <Text style={styles.menuText}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
             <Text style={styles.header}>My Orders</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#4CAF50" style={styles.loader} />
@@ -61,9 +104,10 @@ const OrdersPage = () => {
             ) : (
                 <FlatList
                     data={orders}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())}
                     renderItem={renderOrder}
                 />
+
             )}
         </View>
     );
@@ -115,6 +159,12 @@ const styles = StyleSheet.create({
         height: 80,
         borderRadius: 8,
     },
+    placeholderImage: {
+        width: 80,
+        height: 80,
+        backgroundColor: '#ddd',
+        borderRadius: 8,
+    },
     orderInfo: {
         flex: 1,
         marginLeft: 10,
@@ -130,6 +180,38 @@ const styles = StyleSheet.create({
     productQuantity: {
         fontSize: 14,
         marginVertical: 5,
+    },
+    menuButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        backgroundColor: '#fff',
+        padding: 10,
+        borderRadius: 30,
+    },
+    menu: {
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        backgroundColor: '#fff',
+        padding: 10,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 3,
+        minWidth: 200,
+        zIndex: 1000,
+    },
+    menuItem: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        borderColor: '#ddd',
+    },
+    menuText: {
+        fontSize: 16,
+        color: '#333',
     },
 });
 

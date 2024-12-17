@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from 'react-native';
-
+import Ionicons from "react-native-vector-icons/Ionicons";  // For the menu icon
 
 const settingsOptions = [
   { id: '1', title: 'Thème' },
@@ -17,11 +17,12 @@ const languageOptions = [
 
 const aboutText = "Ceci est une application de démonstration. Elle vous permet de gérer vos paramètres, y compris la langue et le thème.";
 
-const SettingsScreen = () => {
+const SettingsScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isMenuVisible, setMenuVisible] = useState(false); // For menu visibility
 
   const handleThemePress = () => {
     setModalVisible(true);
@@ -48,15 +49,44 @@ const SettingsScreen = () => {
     setDeleteModalVisible(false);
   };
 
+  const handleMenuToggle = () => {
+    setMenuVisible(!isMenuVisible); // Toggle menu visibility
+  };
+
   const renderLanguageItem = ({ item }) => (
       <TouchableOpacity style={styles.languageOption}>
         <Text style={styles.languageText}>{item.title}</Text>
       </TouchableOpacity>
   );
 
-
   return (
       <View style={styles.container}>
+        {/* Menu Button */}
+        <TouchableOpacity onPress={handleMenuToggle} style={styles.menuButton}>
+          <Ionicons name="menu" size={30} color="black" />
+        </TouchableOpacity>
+
+        {/* Menu Visible */}
+        {isMenuVisible && (
+            <View style={styles.menu}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Settings')}>
+                <Text style={styles.menuText}>Settings</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Orders')}>
+                <Text style={styles.menuText}>My Orders</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Basket')}>
+                <Text style={styles.menuText}>My Basket</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Comments')}>
+                <Text style={styles.menuText}>My Comments</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.menuText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+        )}
+
         <Text style={styles.header}>Paramètres</Text>
         {settingsOptions.map(option => (
             <TouchableOpacity key={option.id} style={styles.option} onPress={() => {
@@ -154,17 +184,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     marginTop: 50,
   },
-  darkContainer: {
-    backgroundColor: '#333',
-  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-  },
-  darkHeader: {
-    color: 'white',
   },
   option: {
     padding: 15,
@@ -174,9 +198,6 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 18,
   },
-  darkText: {
-    color: 'white',
-  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -184,10 +205,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     padding: 20,
     borderRadius: 10,
+    marginTop:30,
     marginHorizontal: 40,
-  },
-  darkModalHeader: {
-    color: 'white',
   },
   modalHeader: {
     fontSize: 24,
@@ -242,8 +261,38 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 10,
   },
-  darkAboutText: {
-    color: 'white',
+  menuButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 1000,
+  },
+  menu: {
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+    minWidth: 200,
+    zIndex: 1000,
+  },
+  menuItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

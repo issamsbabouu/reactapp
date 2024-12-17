@@ -36,7 +36,7 @@ const Mydeliveries = ({ navigation }) => {
             </TouchableOpacity>
             {isMenuVisible && (
                 <View style={styles.menu}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Orders')}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Order')}>
                         <Text style={styles.menuText}>Orders</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
@@ -52,7 +52,7 @@ const Mydeliveries = ({ navigation }) => {
             ) : (
                 <FlatList
                     data={orders}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => (item.id ? item.id.toString() : Math.random().toString())}  // Ensure to handle null/undefined
                     renderItem={({ item }) => (
                         <View style={styles.card}>
                             {/* Product Info */}
@@ -62,7 +62,6 @@ const Mydeliveries = ({ navigation }) => {
                             {/* Client Info */}
                             <Text style={styles.clientText}>Client Name: {item.clientName || 'Unknown Client'}</Text>
                             <Text style={styles.clientText}>Client Phone: {item.clientPhone || 'Unknown Phone'}</Text>
-
                         </View>
                     )}
                 />

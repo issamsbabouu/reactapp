@@ -26,14 +26,18 @@ public class ProduitController {
     public List<ProduitDTO> getAllProducts() {
         return produitService.getAllProducts();
     }
-    // Ajouter un nouveau produit
     @PostMapping
     public ResponseEntity<produit> addProduct(@RequestBody produit product) {
-        produit savedProduct = produitService.addProduct(product);  // Appeler le service pour ajouter un produit
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+        try {
+            // Adding the product through the service layer
+            produit savedProduct = produitService.addProduct(product);
+            return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Handle errors if something goes wrong (e.g., database issues)
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    // Supprimer un produit
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         produitService.deleteProduct(id);  // Appeler le service pour supprimer un produit par ID

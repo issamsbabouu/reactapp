@@ -68,11 +68,11 @@ const GestionProduit = ({ navigation }) => {
         if (newProduit.label && newProduit.price && newProduit.quantity && newProduit.categorieId) {
             try {
                 if (isEditing) {
-                    await axios.put(`${API_URL_PRODUCTS}/${selectedProduit.id}`, newProduit);
+                    await axios.put('http://localhost:8080/api/products/add', newProduit);
                     setIsEditing(false);
                     setSelectedProduit(null);
                 } else {
-                    await axios.post(API_URL_PRODUCTS, newProduit);
+                    await axios.post('http://localhost:8080/api/products/add', newProduit);
                 }
                 setNewProduit({
                     label: '',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, ActivityIndicator, FlatList, TouchableOpacity, Image, Modal, Button } from 'react-native';
 import axios from 'axios';
+import Ionicons from "react-native-vector-icons/Ionicons";  // For the menu icon
 
 const ProductListScreen = ({ navigation }) => {
     const [products, setProducts] = useState([]);
@@ -9,9 +10,9 @@ const ProductListScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [basket, setBasket] = useState([]);
     const [isBasketVisible, setIsBasketVisible] = useState(false);
-    const [authToken, setAuthToken] = useState(''); // Assuming you store the auth token after login
+    const [authToken, setAuthToken] = useState('');
+    const [isMenuVisible, setMenuVisible] = useState(false);  // For menu visibility
 
-    // Fetch the products from the backend
     useEffect(() => {
         axios.get('http://localhost:8080/api/products')
             .then(response => {
@@ -35,6 +36,7 @@ const ProductListScreen = ({ navigation }) => {
         if (query) filtered = filtered.filter(product => product.label.toLowerCase().includes(query.toLowerCase()));
         setFilteredProducts(filtered);
     };
+
     const handleAddToBasket = async (product, quantity) => {
         if (!product) {
             console.error('No product selected');
@@ -42,19 +44,16 @@ const ProductListScreen = ({ navigation }) => {
         }
 
         try {
-            // Ensure you're passing the correct parameters in the request body
             const requestBody = {
-                productId: product.id,  // Use the product id from the selected product
-                quantity: quantity      // Quantity passed as argument or default
+                productId: product.id,
+                quantity: quantity
             };
-
-            console.log("Request Body:", requestBody);  // Log the request body to check
 
             const response = await axios.post('http://127.0.0.1:8080/api/panier/add', requestBody, {
                 headers: {
-                    'Content-Type': 'application/json',  // Ensure the content type is set to JSON
+                    'Content-Type': 'application/json',
                 },
-                withCredentials: true  // Include session cookies with the request
+                withCredentials: true
             });
 
             console.log('Product added to basket:', response.data);
@@ -63,10 +62,10 @@ const ProductListScreen = ({ navigation }) => {
         }
     };
 
-
     const handleToggleBasket = () => {
         setIsBasketVisible(!isBasketVisible);
     };
+
     const fetchPanier = async () => {
         try {
             const response = await axios.get('http://127.0.0.1:8080/api/panier/user', {
@@ -74,11 +73,12 @@ const ProductListScreen = ({ navigation }) => {
                     Authorization: `Bearer ${authToken}`,
                 },
             });
-            setBasket(response.data.commandes); // Assuming panier contains commandes list
+            setBasket(response.data.commandes);
         } catch (error) {
             console.error('Error fetching panier:', error);
         }
     };
+
     const handleRemoveFromBasket = (productId) => {
         setBasket(basket.filter(item => item.id !== productId));
     };
@@ -100,6 +100,10 @@ const ProductListScreen = ({ navigation }) => {
             });
     };
 
+    const handleMenuToggle = () => {
+        setMenuVisible(!isMenuVisible);
+    };
+
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -111,6 +115,33 @@ const ProductListScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            {/* Menu Button */}
+            <TouchableOpacity onPress={handleMenuToggle} style={styles.menuButton}>
+                <Ionicons name="menu" size={30} color="black" />
+            </TouchableOpacity>
+
+            {/* Menu Visible */}
+            {isMenuVisible && (
+                <View style={styles.menu}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('myord')}>
+                        <Text style={styles.menuText}>My orders</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('basket')}>
+                        <Text style={styles.menuText}>My basket</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('mycom')}>
+                        <Text style={styles.menuText}>My comments</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Settingsapp')}>
+                        <Text style={styles.menuText}>Settings</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Login')}>
+                        <Text style={styles.menuText}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            {/* Product List */}
             <Text style={styles.header}>Our Products</Text>
             <TextInput
                 style={styles.searchBar}
@@ -131,13 +162,14 @@ const ProductListScreen = ({ navigation }) => {
 
                         <TouchableOpacity
                             style={styles.addToBasketButton}
-                            onPress={() => handleAddToBasket(item, 1)} // Default quantity of 1
+                            onPress={() => handleAddToBasket(item, 1)}
                         >
                             <Image style={styles.cartIconSmall} />
                         </TouchableOpacity>
                     </View>
                 )}
             />
+
             {isBasketVisible && (
                 <View style={styles.basketModal}>
                     <FlatList
@@ -162,12 +194,11 @@ const ProductListScreen = ({ navigation }) => {
                 style={styles.viewBasketButton}
                 onPress={handleToggleBasket}
             >
-                <Image source={{uri: 'cart-icon-url'}} style={styles.cartIconLarge} />
+                <Image source={{ uri: 'cart-icon-url' }} style={styles.cartIconLarge} />
             </TouchableOpacity>
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     header: {
         fontSize: 24,
@@ -180,6 +211,30 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f9f9f9',
         marginTop: 50,
+    },
+    menu: {
+        position: 'absolute',
+        top: 60,
+        left: 20,
+        backgroundColor: '#fff',
+        padding: 10,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 3,
+        minWidth: 200,
+        zIndex: 1000,
+    },
+    menuItem: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        borderColor: '#ddd',
+    },
+    menuText: {
+        fontSize: 16,
+        color: '#333',
     },
     searchBar: {
         height: 40,

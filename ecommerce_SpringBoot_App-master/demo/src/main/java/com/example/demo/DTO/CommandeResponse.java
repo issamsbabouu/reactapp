@@ -5,21 +5,28 @@ public class CommandeResponse {
     private int quantity;
     private Long clientId;
     private String clientName;
-    private String clientPhone;  // Optional
+    private String clientPhone;
+    private String productPrice;
+    private String livreurPhone;
 
     // Constructor with phone number (for /livreur)
-    public CommandeResponse(Long id, String productLabel, int quantity, Long clientId, String clientName, String clientPhone) {
+    public CommandeResponse(Long id, String productLabel , int quantity, Long clientId, String clientName, String clientPhone, String productPrice, String livreurPhone ) {
         this.id = id;
         this.productLabel = productLabel;
         this.quantity = quantity;
         this.clientId = clientId;
         this.clientName = clientName;
         this.clientPhone = clientPhone;
+        this.productPrice = productPrice;
+        this.livreurPhone = livreurPhone;
     }
 
     // Constructor without phone number (for /user)
     public CommandeResponse(Long id, String productLabel, int quantity, Long clientId, String clientName) {
         this(id, productLabel, quantity, clientId, clientName, "");  // Provide an empty string or null for phone
+    }
+
+    public CommandeResponse(Long id, String productLabel, int quantity, Long clientId, String clientName, String s) {
     }
 
     public Long getId() {
